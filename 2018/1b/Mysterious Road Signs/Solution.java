@@ -1,5 +1,7 @@
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Scanner;
-import java.util.stream.IntStream;
+import java.util.Set;
 
 public class Solution {
 	public static void main(String[] args) {
@@ -33,29 +35,78 @@ public class Solution {
 			rights[i] = D[i] - B[i];
 		}
 
-		int maxLength = -1;
-		int countForMaxLength = -1;
-		for (int i = 0; i < S; i++) {
-			for (int j = i; j < S; j++) {
-				if (isValid(lefts, rights, i, j)) {
-					int length = j - i + 1;
+		int maxLength = 1;
+		Set<Range> maxLengthRanges = new HashSet<>();
+		maxLengthRanges.add(new Range(0, 0));
 
-					if (length > maxLength) {
-						maxLength = length;
-						countForMaxLength = 1;
-					} else if (length == maxLength) {
-						countForMaxLength++;
-					}
+		Candidate leftCandidate = new Candidate(lefts[0], Integer.MIN_VALUE, 0, 0);
+		Candidate rightCandidate = new Candidate(rights[0], Integer.MIN_VALUE, 0, 0);
+		for (int endIndex = 1; endIndex < S; endIndex++) {
+			Candidate nextLeftCandidate = buildNextCandidate(leftCandidate, rightCandidate, endIndex, lefts[endIndex],
+					rights[endIndex]);
+			Candidate nextRightCandidate = buildNextCandidate(rightCandidate, leftCandidate, endIndex, rights[endIndex],
+					lefts[endIndex]);
+
+			leftCandidate = nextLeftCandidate;
+			rightCandidate = nextRightCandidate;
+
+			for (Candidate candidate : new Candidate[] { leftCandidate, rightCandidate }) {
+				int length = endIndex - candidate.beginIndex + 1;
+				if (length > maxLength) {
+					maxLength = length;
+					maxLengthRanges.clear();
+					maxLengthRanges.add(new Range(candidate.beginIndex, endIndex));
+				} else if (length == maxLength) {
+					maxLengthRanges.add(new Range(candidate.beginIndex, endIndex));
 				}
 			}
 		}
-		return String.format("%d %d", maxLength, countForMaxLength);
+
+		return String.format("%d %d", maxLength, maxLengthRanges.size());
 	}
 
-	static boolean isValid(int[] lefts, int[] rights, int beginIndex, int endIndex) {
-		return IntStream.rangeClosed(beginIndex, endIndex).filter(i -> lefts[i] != lefts[beginIndex])
-				.map(i -> rights[i]).distinct().count() <= 1
-				|| IntStream.rangeClosed(beginIndex, endIndex).filter(i -> rights[i] != rights[beginIndex])
-						.map(i -> lefts[i]).distinct().count() <= 1;
+	static Candidate buildNextCandidate(Candidate candidate1, Candidate candidate2, int index, int value1, int value2) {
+		if (value1 == candidate1.value1) {
+			return candidate1;
+		} else if (value1 == candidate2.value2) {
+			return new Candidate(value1, candidate2.value1, candidate2.beginIndex, index);
+		} else {
+			return new Candidate(value1, candidate2.value1, candidate2.xBeginIndex, index);
+		}
+	}
+}
+
+class Candidate {
+	int value1;
+	int value2;
+	int beginIndex;
+	int xBeginIndex;
+
+	Candidate(int value1, int value2, int beginIndex, int xBeginIndex) {
+		this.value1 = value1;
+		this.value2 = value2;
+		this.beginIndex = beginIndex;
+		this.xBeginIndex = xBeginIndex;
+	}
+}
+
+class Range {
+	int beginIndex;
+	int endIndex;
+
+	Range(int beginIndex, int endIndex) {
+		this.beginIndex = beginIndex;
+		this.endIndex = endIndex;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(beginIndex, endIndex);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		Range other = (Range) obj;
+		return beginIndex == other.beginIndex && endIndex == other.endIndex;
 	}
 }

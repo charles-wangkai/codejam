@@ -1,8 +1,5 @@
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.stream.IntStream;
 
 public class Solution {
 	public static void main(String[] args) {
@@ -27,58 +24,51 @@ public class Solution {
 		sc.close();
 	}
 
-	static int solve(int[][] R, int[] G) {
-		int[] sequence = IntStream.range(0, R.length).toArray();
+	static long solve(int[][] R, int[] G) {
+		long lower = 0;
+		long upper = Arrays.stream(G).asLongStream().sum();
+		long result = -1;
+		while (lower <= upper) {
+			long middle = (lower + upper) / 2;
 
-		return search(R, G, sequence, 1);
-	}
-
-	static int search(int[][] R, int[] G, int[] sequence, int index) {
-		if (index == sequence.length) {
-			Map<Integer, Integer> metalToOrder = new HashMap<>();
-			for (int i = 0; i < sequence.length; i++) {
-				metalToOrder.put(sequence[i], i);
+			if (isPossible(R, G, middle)) {
+				result = middle;
+				lower = middle + 1;
+			} else {
+				upper = middle - 1;
 			}
-
-			int[] grams = Arrays.copyOf(G, G.length);
-			int result = 0;
-			while (consume(R, metalToOrder, grams, 0, 1)) {
-				result++;
-			}
-			return result;
-		}
-
-		int result = -1;
-		for (int i = index; i < sequence.length; i++) {
-			swap(sequence, i, index);
-
-			result = Math.max(result, search(R, G, sequence, index + 1));
-
-			swap(sequence, i, index);
 		}
 		return result;
 	}
 
-	static void swap(int[] a, int index1, int index2) {
-		int temp = a[index1];
-		a[index1] = a[index2];
-		a[index2] = temp;
-	}
+	static boolean isPossible(int[][] R, int[] G, long targetLead) {
+		long[] grams = Arrays.stream(G).asLongStream().toArray();
+		grams[0] -= targetLead;
 
-	static boolean consume(int[][] R, Map<Integer, Integer> metalToOrder, int[] grams, int metal, int amount) {
-		if (amount <= grams[metal]) {
-			grams[metal] -= amount;
+		for (int i = 0; i < R.length; i++) {
+			if (Arrays.stream(grams).sum() < 0) {
+				return false;
+			}
 
-			return true;
+			boolean found = false;
+
+			long[] nextGrams = Arrays.copyOf(grams, grams.length);
+			for (int metal = 0; metal < grams.length; metal++) {
+				if (grams[metal] < 0) {
+					found = true;
+
+					nextGrams[R[metal][0]] += grams[metal];
+					nextGrams[R[metal][1]] += grams[metal];
+					nextGrams[metal] -= grams[metal];
+				}
+			}
+
+			if (!found) {
+				return true;
+			}
+
+			grams = nextGrams;
 		}
-
-		amount -= grams[metal];
-		grams[metal] = 0;
-
-		int r1 = R[metal][0];
-		int r2 = R[metal][1];
-
-		return metalToOrder.get(metal) < Math.min(metalToOrder.get(r1), metalToOrder.get(r2))
-				&& consume(R, metalToOrder, grams, r1, amount) && consume(R, metalToOrder, grams, r2, amount);
+		return false;
 	}
 }

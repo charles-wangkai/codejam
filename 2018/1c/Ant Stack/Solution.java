@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Solution {
+	static final int W_LIMIT = 1_000_000_000;
+
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
 
@@ -23,32 +25,31 @@ public class Solution {
 	}
 
 	static int solve(int[] W) {
-		Map<Integer, Integer> countToMinWeight = new HashMap<>();
-		countToMinWeight.put(0, 0);
+		Map<Integer, Long> countToMinWeightSum = new HashMap<>();
+		countToMinWeightSum.put(0, 0L);
 
 		for (int wi : W) {
-			Map<Integer, Integer> addedCountToMinWeight = new HashMap<>();
-			for (int count : countToMinWeight.keySet()) {
-				int minWeight = countToMinWeight.get(count);
+			Map<Integer, Long> addedCountToMinWeightSum = new HashMap<>();
+			for (int count : countToMinWeightSum.keySet()) {
+				long minWeightSum = countToMinWeightSum.get(count);
 
-				if (minWeight <= wi * 6) {
-					addedCountToMinWeight.put(count + 1, minWeight + wi);
+				if (minWeightSum <= wi * 6L && minWeightSum + wi <= W_LIMIT * 7L) {
+					addedCountToMinWeightSum.put(count + 1, minWeightSum + wi);
 				}
 			}
 
-			countToMinWeight = merge(countToMinWeight, addedCountToMinWeight);
+			countToMinWeightSum = merge(countToMinWeightSum, addedCountToMinWeightSum);
 		}
 
-		return countToMinWeight.keySet().stream().mapToInt(x -> x).max().getAsInt();
+		return countToMinWeightSum.keySet().stream().mapToInt(x -> x).max().getAsInt();
 	}
 
-	static Map<Integer, Integer> merge(Map<Integer, Integer> countToMinWeight1,
-			Map<Integer, Integer> countToMinWeight2) {
-		Map<Integer, Integer> result = new HashMap<>();
-		for (int count : Stream.concat(countToMinWeight1.keySet().stream(), countToMinWeight2.keySet().stream())
+	static Map<Integer, Long> merge(Map<Integer, Long> countToMinWeightSum1, Map<Integer, Long> countToMinWeightSum2) {
+		Map<Integer, Long> result = new HashMap<>();
+		for (int count : Stream.concat(countToMinWeightSum1.keySet().stream(), countToMinWeightSum2.keySet().stream())
 				.collect(Collectors.toList())) {
-			result.put(count, Math.min(countToMinWeight1.getOrDefault(count, Integer.MAX_VALUE),
-					countToMinWeight2.getOrDefault(count, Integer.MAX_VALUE)));
+			result.put(count, Math.min(countToMinWeightSum1.getOrDefault(count, Long.MAX_VALUE),
+					countToMinWeightSum2.getOrDefault(count, Long.MAX_VALUE)));
 		}
 		return result;
 	}

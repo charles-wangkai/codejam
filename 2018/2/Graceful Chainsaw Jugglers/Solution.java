@@ -32,10 +32,8 @@ public class Solution {
 			return;
 		}
 
-		int count = 0;
-
 		for (int b = 0; b <= maxB; b++) {
-			count++;
+			chosenNum++;
 			remainR -= r;
 			remainB -= b;
 
@@ -43,7 +41,7 @@ public class Solution {
 				break;
 			}
 
-			search(remainR, remainB, chosenNum + count, b, r + 1);
+			search(remainR, remainB, chosenNum, b, r + 1);
 		}
 	}
 }

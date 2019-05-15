@@ -1,4 +1,7 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.IntStream;
 
 public class Solution {
 	public static void main(String[] args) {
@@ -23,59 +26,65 @@ public class Solution {
 	static int solve(int[][] A) {
 		int N = A.length;
 
-		int result = Integer.MAX_VALUE;
-		for (int code = (1 << (N * N)) - 1; code >= 0; code--) {
-			boolean[][] kepts = decode(N, code);
-
-			if (isValid(A, kepts)) {
-				result = Math.min(result, countNotKept(kepts));
-			}
-		}
-		return result;
+		return IntStream.rangeClosed(-N, N).map(value -> computeChangeNum(A, value)).sum();
 	}
 
-	static boolean[][] decode(int N, int code) {
-		boolean[][] result = new boolean[N][N];
-		for (int r = 0; r < N; r++) {
-			for (int c = 0; c < N; c++) {
-				result[r][c] = code % 2 == 0;
-
-				code /= 2;
-			}
-		}
-		return result;
-	}
-
-	static boolean isValid(int[][] A, boolean[][] kepts) {
+	static int computeChangeNum(int[][] A, int value) {
 		int N = A.length;
 
+		Vertex[] leftVertices = initVertices(N);
+		Vertex[] rightVertices = initVertices(N);
+
+		int allCount = 0;
 		for (int r = 0; r < N; r++) {
 			for (int c = 0; c < N; c++) {
-				if (kepts[r][c]) {
-					for (int i = 0; i < N; i++) {
-						if ((i != c && kepts[r][i] && A[r][c] == A[r][i])
-								|| (i != r && kepts[i][c] && A[r][c] == A[i][c])) {
-							return false;
-						}
-					}
+				if (A[r][c] == value) {
+					leftVertices[r].adjacents.add(c);
+					rightVertices[c].adjacents.add(r);
+
+					allCount++;
 				}
 			}
 		}
 
-		return true;
+		int matchingCount = 0;
+		for (int i = 0; i < leftVertices.length; i++) {
+			if (leftVertices[i].matching == -1 && search(leftVertices, rightVertices, new boolean[N], i)) {
+				matchingCount++;
+			}
+		}
+
+		return allCount - matchingCount;
 	}
 
-	static int countNotKept(boolean[][] kepts) {
-		int N = kepts.length;
+	static boolean search(Vertex[] leftVertices, Vertex[] rightVertices, boolean[] rightVisited, int leftIndex) {
+		for (int rightIndex : leftVertices[leftIndex].adjacents) {
+			if (!rightVisited[rightIndex]) {
+				rightVisited[rightIndex] = true;
 
-		int result = 0;
-		for (int r = 0; r < N; r++) {
-			for (int c = 0; c < N; c++) {
-				if (!kepts[r][c]) {
-					result++;
+				if (rightVertices[rightIndex].matching == -1
+						|| search(leftVertices, rightVertices, rightVisited, rightVertices[rightIndex].matching)) {
+					leftVertices[leftIndex].matching = rightIndex;
+					rightVertices[rightIndex].matching = leftIndex;
+
+					return true;
 				}
 			}
 		}
-		return result;
+
+		return false;
 	}
+
+	static Vertex[] initVertices(int N) {
+		Vertex[] vertices = new Vertex[N];
+		for (int i = 0; i < vertices.length; i++) {
+			vertices[i] = new Vertex();
+		}
+		return vertices;
+	}
+}
+
+class Vertex {
+	List<Integer> adjacents = new ArrayList<>();
+	int matching = -1;
 }

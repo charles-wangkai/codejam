@@ -1,6 +1,5 @@
 import java.util.Arrays;
 import java.util.Scanner;
-import java.util.stream.IntStream;
 
 public class Solution {
 	public static void main(String[] args) {
@@ -28,16 +27,6 @@ public class Solution {
 		int minC = Arrays.stream(C).min().getAsInt();
 		int maxC = Arrays.stream(C).max().getAsInt();
 
-		int result = Integer.MAX_VALUE;
-		for (int r = minR; r <= maxR; r++) {
-			for (int c = minC; c <= maxC; c++) {
-				result = Math.min(result, computeTurnNum(R, C, r, c));
-			}
-		}
-		return result;
-	}
-
-	static int computeTurnNum(int[] R, int[] C, int r, int c) {
-		return IntStream.range(0, R.length).map(i -> Math.max(Math.abs(R[i] - r), Math.abs(C[i] - c))).max().getAsInt();
+		return Math.max((maxR - minR + 1) / 2, (maxC - minC + 1) / 2);
 	}
 }

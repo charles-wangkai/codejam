@@ -17,7 +17,7 @@ public class Solution {
 				int D = sc.nextInt();
 
 				if (D == -1) {
-					System.exit(1);
+					System.exit(0);
 				}
 
 				int[] likes = new int[D];

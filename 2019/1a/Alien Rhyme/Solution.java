@@ -3,8 +3,6 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class Solution {
-	static int result;
-
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
 
@@ -28,9 +26,7 @@ public class Solution {
 			addWord(root, word, word.length() - 1);
 		}
 
-		result = 0;
-		search(root, true);
-		return result;
+		return W.length - search(root, true);
 	}
 
 	static int search(TrieNode node, boolean isRoot) {
@@ -43,7 +39,6 @@ public class Solution {
 		}
 
 		if (!isRoot && remain >= 2) {
-			result += 2;
 			remain -= 2;
 		}
 

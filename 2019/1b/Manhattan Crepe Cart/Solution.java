@@ -37,12 +37,8 @@ public class Solution {
 		for (int i = 0; i < P; i++) {
 			if (D[i] == 'N') {
 				yCandidates.add(Y[i] + 1);
-			} else if (D[i] == 'S') {
-				yCandidates.add(Y[i]);
 			} else if (D[i] == 'E') {
 				xCandidates.add(X[i] + 1);
-			} else {
-				xCandidates.add(X[i]);
 			}
 		}
 

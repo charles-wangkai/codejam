@@ -1,9 +1,9 @@
-import java.util.Comparator;
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
-import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -53,10 +53,10 @@ public class Solution {
     }
 
     Map<Set<Point>, Integer> stateToDistance = new HashMap<>();
-    PriorityQueue<Element> pq = new PriorityQueue<>(Comparator.comparing(e -> e.distance));
-    pq.offer(new Element(beginState, null, 0));
-    while (!pq.isEmpty()) {
-      Element head = pq.poll();
+    Queue<Element> queue = new ArrayDeque<>();
+    queue.offer(new Element(beginState, true, 0));
+    while (!queue.isEmpty()) {
+      Element head = queue.poll();
       if (stateToDistance.containsKey(head.state)) {
         continue;
       }
@@ -74,27 +74,10 @@ public class Solution {
             Point after = new Point(before.r + R_OFFSETS[i], before.c + C_OFFSETS[i]);
             Set<Point> nextState = new HashSet<>(others);
             nextState.add(after);
+            boolean nextStable = isStable(nextState);
             if (!stateToDistance.containsKey(nextState)) {
-              if (head.orphan == null) {
-                if (others.isEmpty()
-                    || others.stream().anyMatch(other -> isConnected(other, after))) {
-                  pq.offer(new Element(nextState, null, head.distance + 1));
-                } else {
-                  pq.offer(new Element(nextState, after, head.distance + 1));
-                }
-              } else {
-                if ((before.equals(head.orphan)
-                        && others.stream().anyMatch(other -> isConnected(other, after)))
-                    || (!before.equals(head.orphan)
-                        && isConnected(head.orphan, after)
-                        && (others.size() == 1
-                            || others.stream()
-                                .anyMatch(
-                                    other ->
-                                        !other.equals(head.orphan)
-                                            && isConnected(other, after))))) {
-                  pq.offer(new Element(nextState, null, head.distance + 1));
-                }
+              if (head.stable || nextStable) {
+                queue.offer(new Element(nextState, nextStable, head.distance + 1));
               }
             }
           }
@@ -114,20 +97,33 @@ public class Solution {
         && !others.contains(new Point(r, c));
   }
 
-  static boolean isConnected(Point p1, Point p2) {
-    return (p1.r == p2.r && Math.abs(p1.c - p2.c) == 1)
-        || (p1.c == p2.c && Math.abs(p1.r - p2.r) == 1);
+  static boolean isStable(Set<Point> state) {
+    Set<Point> visited = new HashSet<>();
+    search(state, visited, state.iterator().next());
+
+    return visited.size() == state.size();
+  }
+
+  static void search(Set<Point> state, Set<Point> visited, Point p) {
+    visited.add(p);
+
+    for (int i = 0; i < R_OFFSETS.length; ++i) {
+      Point adj = new Point(p.r + R_OFFSETS[i], p.c + C_OFFSETS[i]);
+      if (state.contains(adj) && !visited.contains(adj)) {
+        search(state, visited, adj);
+      }
+    }
   }
 }
 
 class Element {
   Set<Point> state;
-  Point orphan;
+  boolean stable;
   int distance;
 
-  Element(Set<Point> state, Point orphan, int distance) {
+  Element(Set<Point> state, boolean stable, int distance) {
     this.state = state;
-    this.orphan = orphan;
+    this.stable = stable;
     this.distance = distance;
   }
 }

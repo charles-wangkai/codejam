@@ -1,10 +1,8 @@
 // https://www.cnblogs.com/justPassBy/p/5369930.html
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.stream.IntStream;
 
 public class Solution {
@@ -30,19 +28,6 @@ public class Solution {
 
   static int solve(int[][] prices) {
     int n = prices.length;
-
-    @SuppressWarnings("unchecked")
-    Set<Integer>[] adjSets = new Set[n];
-    for (int i = 0; i < adjSets.length; ++i) {
-      adjSets[i] = new HashSet<>();
-    }
-    for (int i = 0; i < n; ++i) {
-      for (int j = 0; j < n; ++j) {
-        if (isAbove(prices[i], prices[j])) {
-          adjSets[i].add(j);
-        }
-      }
-    }
 
     Vertex[] leftVertices = new Vertex[n];
     for (int i = 0; i < leftVertices.length; ++i) {

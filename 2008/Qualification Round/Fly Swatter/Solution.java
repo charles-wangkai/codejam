@@ -1,3 +1,5 @@
+// https://en.wikipedia.org/wiki/Circular_segment#Arc_length_and_area
+
 import java.util.Scanner;
 
 public class Solution {
@@ -32,11 +34,11 @@ public class Solution {
       double upperX = lowerX + rectSize;
 
       for (double lowerY = r + f;
-          computeDistance(0, 0, lowerX, lowerY) < innerR;
+          computeDistanceToOrigin(lowerX, lowerY) < innerR;
           lowerY += g + 2 * r) {
         double upperY = lowerY + rectSize;
 
-        if (computeDistance(0, 0, upperX, upperY) <= innerR) {
+        if (computeDistanceToOrigin(upperX, upperY) <= innerR) {
           gapArea += rectSize * rectSize;
         } else {
           Double upCrossX = computeUpCrossX(innerR, lowerX, upperX, upperY);
@@ -44,27 +46,31 @@ public class Solution {
           Double rightCrossY = computeRightCrossY(innerR, upperX, lowerY, upperY);
           Double downCrossX = computeDownCrossX(innerR, lowerX, upperX, lowerY);
 
-          if (upCrossX != null && rightCrossY != null) {
-            gapArea +=
-                rectSize * rectSize
-                    - (upperX - upCrossX) * (upperY - rightCrossY) / 2
-                    + computeCircularSegementArea(
-                        innerR, Math.atan2(upperY, upCrossX) - Math.atan2(rightCrossY, upperX));
-          } else if (upCrossX != null && downCrossX != null) {
-            gapArea +=
-                (upCrossX - lowerX + downCrossX - lowerX) * rectSize / 2
-                    + computeCircularSegementArea(
-                        innerR, Math.atan2(upperY, upCrossX) - Math.atan2(lowerY, downCrossX));
-          } else if (leftCrossY != null && rightCrossY != null) {
-            gapArea +=
-                (leftCrossY - lowerY + rightCrossY - lowerY) * rectSize / 2
-                    + computeCircularSegementArea(
-                        innerR, Math.atan2(leftCrossY, lowerX) - Math.atan2(rightCrossY, upperX));
-          } else if (leftCrossY != null && downCrossX != null) {
-            gapArea +=
-                (leftCrossY - lowerY) * (downCrossX - lowerX) / 2
-                    + computeCircularSegementArea(
-                        innerR, Math.atan2(leftCrossY, lowerX) - Math.atan2(lowerY, downCrossX));
+          if (upCrossX != null) {
+            if (rightCrossY != null) {
+              gapArea +=
+                  rectSize * rectSize
+                      - (upperX - upCrossX) * (upperY - rightCrossY) / 2
+                      + computeCircularSegmentArea(
+                          innerR, Math.atan2(upperY, upCrossX) - Math.atan2(rightCrossY, upperX));
+            } else {
+              gapArea +=
+                  (upCrossX - lowerX + downCrossX - lowerX) * rectSize / 2
+                      + computeCircularSegmentArea(
+                          innerR, Math.atan2(upperY, upCrossX) - Math.atan2(lowerY, downCrossX));
+            }
+          } else {
+            if (rightCrossY != null) {
+              gapArea +=
+                  (leftCrossY - lowerY + rightCrossY - lowerY) * rectSize / 2
+                      + computeCircularSegmentArea(
+                          innerR, Math.atan2(leftCrossY, lowerX) - Math.atan2(rightCrossY, upperX));
+            } else {
+              gapArea +=
+                  (leftCrossY - lowerY) * (downCrossX - lowerX) / 2
+                      + computeCircularSegmentArea(
+                          innerR, Math.atan2(leftCrossY, lowerX) - Math.atan2(lowerY, downCrossX));
+            }
           }
         }
       }
@@ -73,15 +79,19 @@ public class Solution {
     return (totalArea - gapArea) / totalArea;
   }
 
-  static double computeCircularSegementArea(double innerR, double angle) {
+  static double computeCircularSegmentArea(double innerR, double angle) {
     return innerR * innerR / 2 * (angle - Math.sin(angle));
   }
 
-  static double computeDistance(double x1, double y1, double x2, double y2) {
-    return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+  static double computeDistanceToOrigin(double x, double y) {
+    return Math.sqrt(x * x + y * y);
   }
 
   static Double computeUpCrossX(double innerR, double lowerX, double upperX, double upperY) {
+    if (upperY > innerR) {
+      return null;
+    }
+
     double upCrossX = Math.sqrt(innerR * innerR - upperY * upperY);
 
     return (upCrossX >= lowerX && upCrossX <= upperX) ? upCrossX : null;
@@ -94,6 +104,10 @@ public class Solution {
   }
 
   static Double computeRightCrossY(double innerR, double upperX, double lowerY, double upperY) {
+    if (upperX > innerR) {
+      return null;
+    }
+
     double rightCrossY = Math.sqrt(innerR * innerR - upperX * upperX);
 
     return (rightCrossY >= lowerY && rightCrossY <= upperY) ? rightCrossY : null;

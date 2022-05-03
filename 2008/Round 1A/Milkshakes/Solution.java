@@ -1,9 +1,6 @@
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.OptionalInt;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -16,74 +13,73 @@ public class Solution {
       int N = sc.nextInt();
       int M = sc.nextInt();
       @SuppressWarnings("unchecked")
-      Set<Like>[] likes = new Set[M];
-      for (int i = 0; i < likes.length; ++i) {
-        likes[i] = new HashSet<>();
+      Map<Integer, Boolean>[] flavorToMaltedMaps = new Map[M];
+      for (int i = 0; i < flavorToMaltedMaps.length; ++i) {
+        flavorToMaltedMaps[i] = new HashMap<>();
       }
-      for (int i = 0; i < likes.length; ++i) {
+      for (int i = 0; i < flavorToMaltedMaps.length; ++i) {
         int T = sc.nextInt();
         for (int j = 0; j < T; ++j) {
-          int flavorIndex = sc.nextInt() - 1;
+          int flavor = sc.nextInt() - 1;
           int malted = sc.nextInt();
 
-          likes[i].add(new Like(flavorIndex, malted));
+          flavorToMaltedMaps[i].put(flavor, malted == 1);
         }
       }
 
-      System.out.println(String.format("Case #%d: %s", tc, solve(N, likes)));
+      System.out.println(String.format("Case #%d: %s", tc, solve(N, flavorToMaltedMaps)));
     }
 
     sc.close();
   }
 
-  static String solve(int N, Set<Like>[] likes) {
-    int[] flavors = new int[N];
-    boolean[] satisfied = new boolean[likes.length];
+  static String solve(int N, Map<Integer, Boolean>[] flavorToMaltedMaps) {
+    boolean[] result = new boolean[N];
+    boolean[] satisfied = new boolean[flavorToMaltedMaps.length];
     while (true) {
-      OptionalInt optionalMaltedIndex =
-          IntStream.range(0, likes.length)
-              .filter(i -> likes[i].size() == 1 && likes[i].iterator().next().malted == 1)
-              .findAny();
-      if (!optionalMaltedIndex.isPresent()) {
+      int[] maltedFlavors =
+          IntStream.range(0, satisfied.length)
+              .filter(
+                  i ->
+                      !satisfied[i]
+                          && flavorToMaltedMaps[i].size() == 1
+                          && flavorToMaltedMaps[i].values().iterator().next())
+              .map(i -> flavorToMaltedMaps[i].keySet().iterator().next())
+              .distinct()
+              .toArray();
+      if (maltedFlavors.length == 0) {
         break;
       }
 
-      int maltedIndex = optionalMaltedIndex.getAsInt();
-      int flavorIndex = likes[maltedIndex].iterator().next().flavorIndex;
-      flavors[flavorIndex] = 1;
-      likes[maltedIndex].clear();
-      satisfied[maltedIndex] = true;
+      for (int maltedFlavor : maltedFlavors) {
+        result[maltedFlavor] = true;
+      }
 
-      Like toRemove = new Like(flavorIndex, 0);
-      Arrays.stream(likes).forEach(l -> l.remove(toRemove));
+      for (int i = 0; i < satisfied.length; ++i) {
+        if (!satisfied[i]) {
+          for (int maltedFlavor : maltedFlavors) {
+            if (flavorToMaltedMaps[i].containsKey(maltedFlavor)) {
+              if (flavorToMaltedMaps[i].get(maltedFlavor)) {
+                satisfied[i] = true;
 
-      if (IntStream.range(0, likes.length).anyMatch(i -> likes[i].isEmpty() && !satisfied[i])) {
+                break;
+              } else {
+                flavorToMaltedMaps[i].remove(maltedFlavor);
+              }
+            }
+          }
+        }
+      }
+
+      if (IntStream.range(0, satisfied.length)
+          .anyMatch(i -> !satisfied[i] && flavorToMaltedMaps[i].isEmpty())) {
         return "IMPOSSIBLE";
       }
     }
 
-    return Arrays.stream(flavors).mapToObj(String::valueOf).collect(Collectors.joining(" "));
-  }
-}
-
-class Like {
-  int flavorIndex;
-  int malted;
-
-  Like(int flavorIndex, int malted) {
-    this.flavorIndex = flavorIndex;
-    this.malted = malted;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(flavorIndex, malted);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    Like other = (Like) obj;
-
-    return flavorIndex == other.flavorIndex && malted == other.malted;
+    return IntStream.range(0, result.length)
+        .map(i -> result[i] ? 1 : 0)
+        .mapToObj(String::valueOf)
+        .collect(Collectors.joining(" "));
   }
 }

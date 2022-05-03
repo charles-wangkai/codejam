@@ -1,4 +1,7 @@
+// https://en.wikipedia.org/wiki/Rearrangement_inequality
+
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Scanner;
 import java.util.stream.IntStream;
 
@@ -25,9 +28,10 @@ public class Solution {
   }
 
   static long solve(int[] x, int[] y) {
-    Arrays.sort(x);
-    Arrays.sort(y);
+    int[] sortedX = Arrays.stream(x).boxed().sorted().mapToInt(a -> a).toArray();
+    int[] sortedY =
+        Arrays.stream(y).boxed().sorted(Comparator.reverseOrder()).mapToInt(a -> a).toArray();
 
-    return IntStream.range(0, x.length).mapToLong(i -> (long) x[i] * y[y.length - 1 - i]).sum();
+    return IntStream.range(0, sortedX.length).mapToLong(i -> (long) sortedX[i] * sortedY[i]).sum();
   }
 }

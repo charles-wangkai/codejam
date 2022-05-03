@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Scanner;
 
 public class Solution {
@@ -31,48 +30,57 @@ public class Solution {
   }
 
   static String solve(int T, String[] aTrips, String[] bTrips) {
-    List<Trip> trips = new ArrayList<>();
+    List<Event> events = new ArrayList<>();
     for (String aTrip : aTrips) {
       String[] parts = aTrip.split(" ");
-      int departure = convertToTime(parts[0]);
-      int arrival = convertToTime(parts[1]);
+      int departureTime = convertToTime(parts[0]);
+      int arrivalTime = convertToTime(parts[1]);
 
-      trips.add(new Trip(true, departure, arrival));
+      events.add(new Event(departureTime, true, true));
+      events.add(new Event(arrivalTime + T, false, false));
     }
     for (String bTrip : bTrips) {
       String[] parts = bTrip.split(" ");
-      int departure = convertToTime(parts[0]);
-      int arrival = convertToTime(parts[1]);
+      int departureTime = convertToTime(parts[0]);
+      int arrivalTime = convertToTime(parts[1]);
 
-      trips.add(new Trip(false, departure, arrival));
+      events.add(new Event(departureTime, true, false));
+      events.add(new Event(arrivalTime + T, false, true));
     }
-    Collections.sort(trips, Comparator.comparing(trip -> trip.departure));
+    Collections.sort(
+        events,
+        Comparator.comparing((Event event) -> event.time)
+            .thenComparing(event -> event.isDeparture));
 
-    int aTrainCount = 0;
-    int bTrainCount = 0;
-    PriorityQueue<Integer> aArrivals = new PriorityQueue<>();
-    PriorityQueue<Integer> bArrivals = new PriorityQueue<>();
-    for (Trip trip : trips) {
-      if (trip.aOrB) {
-        if (!aArrivals.isEmpty() && aArrivals.peek() + T <= trip.departure) {
-          aArrivals.poll();
+    int aStart = 0;
+    int bStart = 0;
+    int aRest = 0;
+    int bRest = 0;
+    for (Event event : events) {
+      if (event.aOrB) {
+        if (event.isDeparture) {
+          if (aRest == 0) {
+            ++aStart;
+          } else {
+            --aRest;
+          }
         } else {
-          ++aTrainCount;
+          ++aRest;
         }
-
-        bArrivals.offer(trip.arrival);
       } else {
-        if (!bArrivals.isEmpty() && bArrivals.peek() + T <= trip.departure) {
-          bArrivals.poll();
+        if (event.isDeparture) {
+          if (bRest == 0) {
+            ++bStart;
+          } else {
+            --bRest;
+          }
         } else {
-          ++bTrainCount;
+          ++bRest;
         }
-
-        aArrivals.offer(trip.arrival);
       }
     }
 
-    return String.format("%d %d", aTrainCount, bTrainCount);
+    return String.format("%d %d", aStart, bStart);
   }
 
   static int convertToTime(String s) {
@@ -83,14 +91,14 @@ public class Solution {
   }
 }
 
-class Trip {
+class Event {
+  int time;
+  boolean isDeparture;
   boolean aOrB;
-  int departure;
-  int arrival;
 
-  Trip(boolean aOrB, int departure, int arrival) {
+  Event(int time, boolean isDeparture, boolean aOrB) {
+    this.time = time;
+    this.isDeparture = isDeparture;
     this.aOrB = aOrB;
-    this.departure = departure;
-    this.arrival = arrival;
   }
 }

@@ -36,7 +36,7 @@ public class Solution {
         if (!engines[i].equals(query)) {
           for (int j = 0; j < switchNums.length; ++j) {
             if (switchNums[j] != Integer.MAX_VALUE) {
-              nextSwitchNums[i] = Math.min(nextSwitchNums[i], switchNums[j] + (j == i ? 0 : 1));
+              nextSwitchNums[i] = Math.min(nextSwitchNums[i], switchNums[j] + ((j == i) ? 0 : 1));
             }
           }
         }

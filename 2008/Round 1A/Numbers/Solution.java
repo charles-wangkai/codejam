@@ -17,20 +17,15 @@ public class Solution {
   }
 
   static String solve(int n) {
-    int[][] transition = new int[][] {{3, 1}, {5, 3}};
-    transition = pow(transition, n);
-
-    int[] v = multiply(new int[] {1, 0}, transition);
-
-    return String.format("%03d", subtractMod(multiplyMod(v[0], 2), 1));
+    return String.format(
+        "%03d",
+        addMod(
+            multiplyMod(multiply(new int[] {1, 0}, pow(new int[][] {{3, 1}, {5, 3}}, n))[0], 2),
+            -1));
   }
 
   static int addMod(int x, int y) {
-    return (x + y) % MODULUS;
-  }
-
-  static int subtractMod(int x, int y) {
-    return (x - y + MODULUS) % MODULUS;
+    return Math.floorMod(x + y, MODULUS);
   }
 
   static int multiplyMod(int x, int y) {
@@ -38,11 +33,11 @@ public class Solution {
   }
 
   static int[] multiply(int[] v, int[][] m) {
-    int length = v.length;
+    int size = v.length;
 
-    int[] result = new int[length];
+    int[] result = new int[size];
     for (int i = 0; i < result.length; ++i) {
-      for (int j = 0; j < length; ++j) {
+      for (int j = 0; j < size; ++j) {
         result[i] = addMod(result[i], multiplyMod(v[j], m[j][i]));
       }
     }

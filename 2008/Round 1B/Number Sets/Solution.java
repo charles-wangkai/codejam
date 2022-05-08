@@ -26,8 +26,8 @@ public class Solution {
     Arrays.fill(primes, true);
     for (int i = 2; i < primes.length; ++i) {
       if (primes[i]) {
-        for (long j = (long) i * i; j < primes.length; j += i) {
-          primes[(int) j] = false;
+        for (int j = 2 * i; j < primes.length; j += i) {
+          primes[j] = false;
         }
 
         if (i >= P) {

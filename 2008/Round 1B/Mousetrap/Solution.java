@@ -14,7 +14,7 @@ public class Solution {
       int n = sc.nextInt();
       int[] d = new int[n];
       for (int i = 0; i < d.length; ++i) {
-        d[i] = sc.nextInt();
+        d[i] = sc.nextInt() - 1;
       }
 
       System.out.println(String.format("Case #%d: %s", tc, solve(K, d)));
@@ -24,19 +24,19 @@ public class Solution {
   }
 
   static String solve(int K, int[] d) {
-    int[] values = new int[K + 1];
+    int[] values = new int[K];
 
-    int[] A = new int[K + 1];
-    for (int i = 1; i < A.length; ++i) {
+    int[] A = new int[Integer.highestOneBit(K) * 2 + 1];
+    for (int i = 0; i < K; ++i) {
       add(A, i, 1);
     }
 
-    int index = 0;
+    int index = -1;
     for (int value = 1; value <= K; ++value) {
       int step = (value - 1) % (K - value + 1) + 1;
-      int maxRight = sum(A, K) - sum(A, index);
+      int maxRight = prefixSum(A, K - 1) - ((index == -1) ? 0 : prefixSum(A, index));
       if (step <= maxRight) {
-        index = findNext(A, index, K, step);
+        index = findNext(A, index + 1, K - 1, step);
       } else {
         index = findNext(A, 0, index - 1, step - maxRight);
       }
@@ -46,16 +46,17 @@ public class Solution {
     }
 
     return Arrays.stream(d)
-        .mapToObj(i -> String.valueOf(values[i]))
+        .map(i -> values[i])
+        .mapToObj(String::valueOf)
         .collect(Collectors.joining(" "));
   }
 
   static int findNext(int[] A, int lowerIndex, int upperIndex, int targetDiff) {
-    int baseSum = sum(A, lowerIndex);
+    int baseSum = (lowerIndex == 0) ? 0 : prefixSum(A, lowerIndex - 1);
     int result = -1;
     while (lowerIndex <= upperIndex) {
       int middleIndex = (lowerIndex + upperIndex) / 2;
-      if (sum(A, middleIndex) - baseSum >= targetDiff) {
+      if (prefixSum(A, middleIndex) - baseSum >= targetDiff) {
         result = middleIndex;
         upperIndex = middleIndex - 1;
       } else {
@@ -70,20 +71,17 @@ public class Solution {
     return x & -x;
   }
 
-  static int sum(int[] A, int i) {
-    int sum = 0;
-    while (i > 0) {
-      sum += A[i];
-      i -= LSB(i);
+  static void add(int[] A, int i, int delta) {
+    if (i == 0) {
+      A[0] += delta;
+      return;
     }
-
-    return sum;
+    for (; i < A.length; i += LSB(i)) A[i] += delta;
   }
 
-  static void add(int[] A, int i, int k) {
-    while (i < A.length) {
-      A[i] += k;
-      i += LSB(i);
-    }
+  static int prefixSum(int[] A, int i) {
+    int sum = A[0];
+    for (; i != 0; i -= LSB(i)) sum += A[i];
+    return sum;
   }
 }

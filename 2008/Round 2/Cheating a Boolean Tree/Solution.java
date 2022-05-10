@@ -47,13 +47,11 @@ public class Solution {
 
                 if (G[i - 1] == 1) {
                   dp[i][andResult] = Math.min(dp[i][andResult], subDpSum);
-
                   if (C[i - 1] == 1) {
                     dp[i][orResult] = Math.min(dp[i][orResult], subDpSum + 1);
                   }
                 } else {
                   dp[i][orResult] = Math.min(dp[i][orResult], subDpSum);
-
                   if (C[i - 1] == 1) {
                     dp[i][andResult] = Math.min(dp[i][andResult], subDpSum + 1);
                   }

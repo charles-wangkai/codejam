@@ -1,3 +1,5 @@
+// https://codingcompetitions.withgoogle.com/codejam/round/0000000000432cc0/0000000000432bd5#analysis
+
 import java.util.Scanner;
 
 public class Solution {
@@ -21,27 +23,12 @@ public class Solution {
       return "IMPOSSIBLE";
     }
 
-    int x1;
-    int y1;
-    int x2;
-    int y2;
-    int x3;
-    int y3;
-    if (A % M == 0) {
-      x1 = A / M;
-      y1 = 0;
-      x2 = A / M;
-      y2 = M;
-      x3 = 0;
-      y3 = 0;
-    } else {
-      x1 = A / M;
-      y1 = 0;
-      x2 = A / M + 1;
-      y2 = M;
-      x3 = 0;
-      y3 = A % M;
-    }
+    int x1 = A / M;
+    int y1 = 0;
+    int x2 = x1 + ((A % M == 0) ? 0 : 1);
+    int y2 = M;
+    int x3 = 0;
+    int y3 = A % M;
 
     return String.format("%d %d %d %d %d %d", x1, y1, x2, y2, x3, y3);
   }

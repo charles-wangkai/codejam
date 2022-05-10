@@ -33,37 +33,35 @@ public class Solution {
   static int solve(int n, int[] A, int X, int Y, int Z) {
     int[] values = compress(generateSpeeds(n, A, X, Y, Z));
 
-    int[] a = new int[values.length + 1];
+    int[] a = new int[Integer.highestOneBit(values.length) * 2 + 1];
     for (int value : values) {
-      add(a, value, addMod(sum(a, value - 1), 1, MODULUS));
+      add(a, value, addMod(prefixSum(a, value - 1), 1, MODULUS));
     }
 
-    return sum(a, values.length);
+    return prefixSum(a, values.length);
   }
 
   static int LSB(int i) {
     return i & -i;
   }
 
-  static int sum(int[] a, int i) {
-    int sum = 0;
-    while (i > 0) {
-      sum = addMod(sum, a[i], MODULUS);
-      i -= LSB(i);
-    }
-
+  static int prefixSum(int[] a, int i) {
+    int sum = a[0];
+    for (; i != 0; i -= LSB(i)) sum = addMod(sum, a[i], MODULUS);
     return sum;
   }
 
-  static void add(int[] a, int i, int k) {
-    while (i < a.length) {
-      a[i] = addMod(a[i], k, MODULUS);
-      i += LSB(i);
+  static void add(int[] a, int i, int delta) {
+    if (i == 0) {
+      a[0] = addMod(a[0], delta, MODULUS);
+      return;
     }
+    for (; i < a.length; i += LSB(i)) a[i] = addMod(a[i], delta, MODULUS);
   }
 
   static int[] compress(int[] speeds) {
-    int[] sortedSpeeds = Arrays.stream(speeds).distinct().sorted().toArray();
+    int[] sortedSpeeds =
+        Arrays.stream(speeds).boxed().sorted().distinct().mapToInt(x -> x).toArray();
     Map<Integer, Integer> speedToSortedIndex =
         IntStream.range(0, sortedSpeeds.length)
             .boxed()
@@ -83,10 +81,10 @@ public class Solution {
   }
 
   static int addMod(int x, int y, int m) {
-    return (x + y) % m;
+    return Math.floorMod(x + y, m);
   }
 
   static int multiplyMod(int x, int y, int m) {
-    return (int) ((long) x * y % m);
+    return Math.floorMod((long) x * y, m);
   }
 }

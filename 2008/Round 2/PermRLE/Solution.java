@@ -28,10 +28,10 @@ public class Solution {
     }
 
     int[][][] dp = new int[1 << k][k][k];
-    for (int code = 0; code < 1 << k; ++code) {
+    for (int mask = 0; mask < 1 << k; ++mask) {
       for (int left = 0; left < k; ++left) {
         for (int right = 0; right < k; ++right) {
-          dp[code][left][right] = Integer.MAX_VALUE;
+          dp[mask][left][right] = Integer.MAX_VALUE;
         }
       }
     }
@@ -51,22 +51,20 @@ public class Solution {
       }
     }
 
-    for (int code = 0; code < 1 << k; ++code) {
-      if (Integer.bitCount(code) >= 3) {
-        for (int right = 0; right < k; ++right) {
-          if ((code & (1 << right)) != 0) {
-            for (int left = 0; left < k; ++left) {
-              if (left != right && (code & (1 << left)) != 0) {
-                int prevCode = code - (1 << left);
-                for (int prevLeft = 0; prevLeft < k; ++prevLeft) {
-                  if (prevLeft != right
-                      && (prevCode & (1 << prevLeft)) != 0
-                      && dp[prevCode][prevLeft][right] != Integer.MAX_VALUE) {
-                    dp[code][left][right] =
-                        Math.min(
-                            dp[code][left][right],
-                            dp[prevCode][prevLeft][right] + deltas[prevLeft][left]);
-                  }
+    for (int mask = 0; mask < 1 << k; ++mask) {
+      for (int right = 0; right < k; ++right) {
+        if ((mask & (1 << right)) != 0) {
+          for (int left = 0; left < k; ++left) {
+            if (left != right && (mask & (1 << left)) != 0) {
+              int prevMask = mask - (1 << left);
+              for (int prevLeft = 0; prevLeft < k; ++prevLeft) {
+                if (prevLeft != right
+                    && (prevMask & (1 << prevLeft)) != 0
+                    && dp[prevMask][prevLeft][right] != Integer.MAX_VALUE) {
+                  dp[mask][left][right] =
+                      Math.min(
+                          dp[mask][left][right],
+                          dp[prevMask][prevLeft][right] + deltas[prevLeft][left]);
                 }
               }
             }

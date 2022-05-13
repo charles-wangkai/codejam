@@ -33,27 +33,27 @@ public class Solution {
   }
 
   static int solve(Pair[] pairs) {
-    Map<Integer, List<Integer>> pathLowerXToYs = new HashMap<>();
-    Map<Integer, List<Integer>> pathLowerYToXs = new HashMap<>();
+    Map<Integer, List<Integer>> lowerXToYs = new HashMap<>();
+    Map<Integer, List<Integer>> lowerYToXs = new HashMap<>();
     int x = 0;
     int y = 0;
     int direction = 0;
     for (Pair pair : pairs) {
       for (int i = 0; i < pair.T; ++i) {
-        for (char ch : pair.S.toCharArray()) {
-          if (ch == 'L') {
-            direction = (direction - 1 + X_OFFSETS.length) % X_OFFSETS.length;
-          } else if (ch == 'R') {
+        for (char c : pair.S.toCharArray()) {
+          if (c == 'L') {
+            direction = Math.floorMod(direction - 1, X_OFFSETS.length);
+          } else if (c == 'R') {
             direction = (direction + 1) % X_OFFSETS.length;
           } else {
             if (direction == 0) {
-              addPath(pathLowerYToXs, y, x);
+              addPath(lowerYToXs, y, x);
             } else if (direction == 1) {
-              addPath(pathLowerXToYs, x, y);
+              addPath(lowerXToYs, x, y);
             } else if (direction == 2) {
-              addPath(pathLowerYToXs, y - 1, x);
+              addPath(lowerYToXs, y - 1, x);
             } else {
-              addPath(pathLowerXToYs, x - 1, y);
+              addPath(lowerXToYs, x - 1, y);
             }
 
             x += X_OFFSETS[direction];
@@ -64,22 +64,22 @@ public class Solution {
     }
 
     Set<Pocket> pockets = new HashSet<>();
-    for (int lowerX : pathLowerXToYs.keySet()) {
-      List<Integer> ys = pathLowerXToYs.get(lowerX);
+    for (int lowerX : lowerXToYs.keySet()) {
+      List<Integer> ys = lowerXToYs.get(lowerX);
       Collections.sort(ys);
 
       for (int i = 1; i + 1 < ys.size(); i += 2) {
-        for (int lowerY = ys.get(i); lowerY <= ys.get(i + 1) - 1; ++lowerY) {
+        for (int lowerY = ys.get(i); lowerY < ys.get(i + 1); ++lowerY) {
           pockets.add(new Pocket(lowerX, lowerY));
         }
       }
     }
-    for (int lowerY : pathLowerYToXs.keySet()) {
-      List<Integer> xs = pathLowerYToXs.get(lowerY);
+    for (int lowerY : lowerYToXs.keySet()) {
+      List<Integer> xs = lowerYToXs.get(lowerY);
       Collections.sort(xs);
 
       for (int i = 1; i + 1 < xs.size(); i += 2) {
-        for (int lowerX = xs.get(i); lowerX <= xs.get(i + 1) - 1; ++lowerX) {
+        for (int lowerX = xs.get(i); lowerX < xs.get(i + 1); ++lowerX) {
           pockets.add(new Pocket(lowerX, lowerY));
         }
       }
@@ -89,10 +89,7 @@ public class Solution {
   }
 
   static void addPath(Map<Integer, List<Integer>> path, int key, int value) {
-    if (!path.containsKey(key)) {
-      path.put(key, new ArrayList<>());
-    }
-
+    path.putIfAbsent(key, new ArrayList<>());
     path.get(key).add(value);
   }
 }

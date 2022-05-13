@@ -60,44 +60,41 @@ public class Solution {
       for (int portalDirection = 0; portalDirection < R_OFFSETS.length; ++portalDirection) {
         int portalR = head.currentR;
         int portalC = head.currentC;
-        while (portalR - R_OFFSETS[portalDirection] >= 0
-            && portalR - R_OFFSETS[portalDirection] < R
-            && portalC - C_OFFSETS[portalDirection] >= 0
-            && portalC - C_OFFSETS[portalDirection] < C
-            && grid[portalR - R_OFFSETS[portalDirection]][portalC - C_OFFSETS[portalDirection]]
+        while (portalR + R_OFFSETS[portalDirection] >= 0
+            && portalR + R_OFFSETS[portalDirection] < R
+            && portalC + C_OFFSETS[portalDirection] >= 0
+            && portalC + C_OFFSETS[portalDirection] < C
+            && grid[portalR + R_OFFSETS[portalDirection]][portalC + C_OFFSETS[portalDirection]]
                 != '#') {
-          portalR -= R_OFFSETS[portalDirection];
-          portalC -= C_OFFSETS[portalDirection];
+          portalR += R_OFFSETS[portalDirection];
+          portalC += C_OFFSETS[portalDirection];
         }
 
-        State state1 =
-            new State(
-                head.currentR,
-                head.currentC,
-                portalR,
-                portalC,
-                portalDirection,
-                head.portalR2,
-                head.portalC2,
-                head.portalDirection2);
-        if (check(state1) && !stateToMoveNum.containsKey(state1)) {
-          stateToMoveNum.put(state1, stateToMoveNum.get(head));
-          deque.offerFirst(state1);
-        }
-
-        State state2 =
-            new State(
-                head.currentR,
-                head.currentC,
-                head.portalR1,
-                head.portalC1,
-                head.portalDirection1,
-                portalR,
-                portalC,
-                portalDirection);
-        if (check(state2) && !stateToMoveNum.containsKey(state2)) {
-          stateToMoveNum.put(state2, stateToMoveNum.get(head));
-          deque.offerFirst(state2);
+        for (State state :
+            new State[] {
+              new State(
+                  head.currentR,
+                  head.currentC,
+                  portalR,
+                  portalC,
+                  portalDirection,
+                  head.portalR2,
+                  head.portalC2,
+                  head.portalDirection2),
+              new State(
+                  head.currentR,
+                  head.currentC,
+                  head.portalR1,
+                  head.portalC1,
+                  head.portalDirection1,
+                  portalR,
+                  portalC,
+                  portalDirection)
+            }) {
+          if (!stateToMoveNum.containsKey(state)) {
+            stateToMoveNum.put(state, stateToMoveNum.get(head));
+            deque.offerFirst(state);
+          }
         }
       }
 
@@ -106,12 +103,12 @@ public class Solution {
         int currentC;
         if (head.currentR == head.portalR1
             && head.currentC == head.portalC1
-            && Math.abs(direction - head.portalDirection1) == 2) {
+            && direction == head.portalDirection1) {
           currentR = head.portalR2;
           currentC = head.portalC2;
         } else if (head.currentR == head.portalR2
             && head.currentC == head.portalC2
-            && Math.abs(direction - head.portalDirection2) == 2) {
+            && direction == head.portalDirection2) {
           currentR = head.portalR1;
           currentC = head.portalC1;
         } else {
@@ -134,7 +131,7 @@ public class Solution {
                   head.portalR2,
                   head.portalC2,
                   head.portalDirection2);
-          if (check(state) && !stateToMoveNum.containsKey(state)) {
+          if (!stateToMoveNum.containsKey(state)) {
             stateToMoveNum.put(state, stateToMoveNum.get(head) + 1);
             deque.offerLast(state);
           }
@@ -143,15 +140,6 @@ public class Solution {
     }
 
     return "THE CAKE IS A LIE";
-  }
-
-  static boolean check(State state) {
-    return !(state.portalR1 == state.portalR2 && state.portalC1 == state.portalC2)
-        && (state.portalR1 < state.portalR2
-            || (state.portalR1 == state.portalR2
-                && (state.portalC1 < state.portalC2
-                    || (state.portalC1 == state.portalC2
-                        && state.portalDirection1 <= state.portalDirection2))));
   }
 }
 

@@ -1,8 +1,10 @@
 // https://www.cnblogs.com/czsharecode/p/9777533.html
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 public class Solution {
   static final int[] R_OFFSETS = {-1, -1, 0, 0};
@@ -104,7 +106,7 @@ public class Solution {
 
 class Vertex {
   int index;
-  List<Integer> adjacents = new ArrayList<>();
+  Set<Integer> adjacents = new HashSet<>();
   int matching = -1;
 
   Vertex(int index) {

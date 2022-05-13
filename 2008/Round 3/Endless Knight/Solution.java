@@ -34,21 +34,19 @@ public class Solution {
   }
 
   static int solve(int H, int W, int[] r, int[] c) {
-    int rockNum = r.length;
-
-    int result = computeWayNums(H - 1, W - 1);
-
     int[] sortedRockIndices =
-        IntStream.range(0, rockNum)
+        IntStream.range(0, r.length)
             .boxed()
             .sorted(Comparator.comparing(i -> r[i]))
             .mapToInt(x -> x)
             .toArray();
-    for (int code = 1; code < 1 << rockNum; ++code) {
-      int code_ = code;
+
+    int result = computeWayNums(H - 1, W - 1);
+    for (int mask = 1; mask < 1 << sortedRockIndices.length; ++mask) {
+      int mask_ = mask;
       int[] indices =
-          IntStream.range(0, rockNum)
-              .filter(i -> (code_ & (1 << i)) != 0)
+          IntStream.range(0, sortedRockIndices.length)
+              .filter(i -> (mask_ & (1 << i)) != 0)
               .map(i -> sortedRockIndices[i])
               .toArray();
 
@@ -62,11 +60,7 @@ public class Solution {
                     ((i == indices.length - 1) ? W : c[indices[i + 1]]) - c[indices[i]]));
       }
 
-      if (indices.length % 2 == 0) {
-        result = addMod(result, term);
-      } else {
-        result = subtractMod(result, term);
-      }
+      result = addMod(result, ((indices.length % 2 == 0) ? 1 : -1) * term);
     }
 
     return result;
@@ -93,22 +87,18 @@ public class Solution {
     factorialExponents = new short[factorialMods.length];
     for (int i = 1; i < factorialMods.length; ++i) {
       factorialExponents[i] = factorialExponents[i - 1];
-      int m = i;
-      while (m % MODULUS == 0) {
+      int rest = i;
+      while (rest % MODULUS == 0) {
         ++factorialExponents[i];
-        m /= MODULUS;
+        rest /= MODULUS;
       }
 
-      factorialMods[i] = (short) multiplyMod(factorialMods[i - 1], m % MODULUS);
+      factorialMods[i] = (short) multiplyMod(factorialMods[i - 1], rest % MODULUS);
     }
   }
 
   static int addMod(int x, int y) {
-    return (x + y) % MODULUS;
-  }
-
-  static int subtractMod(int x, int y) {
-    return (x - y + MODULUS) % MODULUS;
+    return Math.floorMod(x + y, MODULUS);
   }
 
   static int multiplyMod(int x, int y) {

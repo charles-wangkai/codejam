@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.stream.IntStream;
 
 public class Solution {
   static final int[] R_OFFSETS = {-1, 0, 0, 1};
@@ -61,11 +62,8 @@ public class Solution {
             }
           }
 
-          if (direction != -1) {
-            next[r + R_OFFSETS[direction]][c + C_OFFSETS[direction]] =
-                Math.max(
-                    0, next[r + R_OFFSETS[direction]][c + C_OFFSETS[direction]] - current[r][c]);
-          }
+          next[r + R_OFFSETS[direction]][c + C_OFFSETS[direction]] =
+              Math.max(0, next[r + R_OFFSETS[direction]][c + C_OFFSETS[direction]] - current[r][c]);
         }
       }
     }
@@ -97,14 +95,13 @@ public class Solution {
     int R = next.length;
     int C = next[0].length;
 
-    for (int i = 0; i < R_OFFSETS.length; ++i) {
-      int adjR = myR + R_OFFSETS[i];
-      int adjC = myC + C_OFFSETS[i];
-      if (adjR >= 0 && adjR < R && adjC >= 0 && adjC < C && next[adjR][adjC] != 0) {
-        return false;
-      }
-    }
+    return !IntStream.range(0, R_OFFSETS.length)
+        .anyMatch(
+            i -> {
+              int adjR = myR + R_OFFSETS[i];
+              int adjC = myC + C_OFFSETS[i];
 
-    return true;
+              return adjR >= 0 && adjR < R && adjC >= 0 && adjC < C && next[adjR][adjC] != 0;
+            });
   }
 }

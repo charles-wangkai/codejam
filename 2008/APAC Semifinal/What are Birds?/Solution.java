@@ -36,27 +36,28 @@ public class Solution {
   static String solve(Animal[] shown, Animal[] notShown) {
     List<Animal> animals = Arrays.stream(shown).collect(Collectors.toList());
 
-    for (Animal a : notShown) {
-      animals.add(a);
+    String[] result = new String[notShown.length];
+    for (int i = 0; i < result.length; ++i) {
+      animals.add(notShown[i]);
 
-      a.X = "BIRD";
+      notShown[i].X = "BIRD";
       boolean birdPossible = isPossible(animals);
 
-      a.X = "NOT BIRD";
+      notShown[i].X = "NOT BIRD";
       boolean notBirdPossible = isPossible(animals);
 
       if (birdPossible && notBirdPossible) {
-        a.X = "UNKNOWN";
+        result[i] = "UNKNOWN";
       } else if (birdPossible) {
-        a.X = "BIRD";
+        result[i] = "BIRD";
       } else {
-        a.X = "NOT BIRD";
+        result[i] = "NOT BIRD";
       }
 
       animals.remove(animals.size() - 1);
     }
 
-    return Arrays.stream(notShown).map(a -> a.X).collect(Collectors.joining("\n"));
+    return String.join("\n", result);
   }
 
   static boolean isPossible(List<Animal> animals) {
@@ -64,13 +65,12 @@ public class Solution {
     int maxH = Integer.MIN_VALUE;
     int minW = Integer.MAX_VALUE;
     int maxW = Integer.MIN_VALUE;
-
-    for (Animal a : animals) {
-      if (a.X.equals("BIRD")) {
-        minH = Math.min(minH, a.H);
-        maxH = Math.max(maxH, a.H);
-        minW = Math.min(minW, a.W);
-        maxW = Math.max(maxW, a.W);
+    for (Animal animal : animals) {
+      if (animal.X.equals("BIRD")) {
+        minH = Math.min(minH, animal.H);
+        maxH = Math.max(maxH, animal.H);
+        minW = Math.min(minW, animal.W);
+        maxW = Math.max(maxW, animal.W);
       }
     }
 
@@ -79,10 +79,13 @@ public class Solution {
     int minW_ = minW;
     int maxW_ = maxW;
     return animals.stream()
+        .filter(animal -> animal.X.equals("NOT BIRD"))
         .allMatch(
-            a ->
-                a.X.equals("BIRD")
-                    || !(a.H >= minH_ && a.H <= maxH_ && a.W >= minW_ && a.W <= maxW_));
+            animal ->
+                !(animal.H >= minH_
+                    && animal.H <= maxH_
+                    && animal.W >= minW_
+                    && animal.W <= maxW_));
   }
 }
 

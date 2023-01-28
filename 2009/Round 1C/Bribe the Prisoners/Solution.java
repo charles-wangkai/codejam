@@ -24,7 +24,7 @@ public class Solution {
 
     int[][] coinNums = new int[Q][Q];
     for (int length = 1; length <= Q; ++length) {
-      for (int beginIndex = 0; beginIndex + length <= Q; ++beginIndex) {
+      for (int beginIndex = 0; beginIndex + length - 1 < Q; ++beginIndex) {
         int endIndex = beginIndex + length - 1;
 
         int left = (beginIndex == 0) ? 1 : (released[beginIndex - 1] + 1);

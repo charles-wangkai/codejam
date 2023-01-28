@@ -33,11 +33,11 @@ public class Solution {
     int result = 0;
     for (int i = 0; i < lastOneIndices.length; ++i) {
       int firstIndex = i;
-      while (lastOneIndices[firstIndex] > i) {
+      while (lastOneIndices[firstIndex] >= i + 1) {
         ++firstIndex;
       }
 
-      for (int j = firstIndex; j != i; --j) {
+      for (int j = firstIndex; j >= i + 1; --j) {
         swap(lastOneIndices, j, j - 1);
         ++result;
       }

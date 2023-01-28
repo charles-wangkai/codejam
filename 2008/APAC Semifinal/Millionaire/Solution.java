@@ -22,12 +22,9 @@ public class Solution {
       probs[i] = new double[(1 << i) + 1];
       probs[i][1 << i] = 1;
 
-      if (i != 0) {
-        for (int j = 1; j < 1 << i; ++j) {
-          for (int k = Math.max(0, j - (1 << (i - 1))); k <= j - k; ++k) {
-            probs[i][j] =
-                Math.max(probs[i][j], (1 - P) * probs[i - 1][k] + P * probs[i - 1][j - k]);
-          }
+      for (int j = 1; j < 1 << i; ++j) {
+        for (int k = Math.max(0, j - (1 << (i - 1))); k <= j - k; ++k) {
+          probs[i][j] = Math.max(probs[i][j], (1 - P) * probs[i - 1][k] + P * probs[i - 1][j - k]);
         }
       }
     }

@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Scanner;
 import java.util.Set;
 
-public class Solution {
+public class Main {
   static final int[] X_OFFSETS = {0, 1, 0, -1};
   static final int[] Y_OFFSETS = {1, 0, -1, 0};
 

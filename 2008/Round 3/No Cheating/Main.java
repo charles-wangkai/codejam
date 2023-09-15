@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
-public class Solution {
+public class Main {
   static final int[] R_OFFSETS = {-1, -1, 0, 0};
   static final int[] C_OFFSETS = {-1, 1, -1, 1};
 

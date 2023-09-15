@@ -1,7 +1,7 @@
 import java.util.Scanner;
 import java.util.stream.IntStream;
 
-public class Solution {
+public class Main {
   static final int[] R_OFFSETS = {-1, 0, 0, 1};
   static final int[] C_OFFSETS = {0, -1, 1, 0};
 

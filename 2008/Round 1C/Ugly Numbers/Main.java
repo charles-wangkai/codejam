@@ -2,7 +2,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.stream.IntStream;
 
-public class Solution {
+public class Main {
   static final int[] PRIMES = {2, 3, 5, 7};
   static final int MODULUS = Arrays.stream(PRIMES).reduce((x, y) -> x * y).getAsInt();
 

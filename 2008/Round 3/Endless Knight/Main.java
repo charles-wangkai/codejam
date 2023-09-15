@@ -3,7 +3,7 @@ import java.util.Comparator;
 import java.util.Scanner;
 import java.util.stream.IntStream;
 
-public class Solution {
+public class Main {
   static final int MODULUS = 10007;
   static final int LIMIT = 100_000_000;
 

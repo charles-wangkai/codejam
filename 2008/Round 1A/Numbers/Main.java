@@ -60,8 +60,8 @@ public class Main {
     return result;
   }
 
-  static int[][] pow(int[][] m, int exponent) {
-    int size = m.length;
+  static int[][] pow(int[][] base, int exponent) {
+    int size = base.length;
 
     int[][] result = new int[size][size];
     for (int i = 0; i < size; ++i) {
@@ -69,12 +69,12 @@ public class Main {
     }
 
     while (exponent != 0) {
-      if (exponent % 2 != 0) {
-        result = multiply(result, m);
+      if ((exponent & 1) == 1) {
+        result = multiply(result, base);
       }
 
-      m = multiply(m, m);
-      exponent /= 2;
+      base = multiply(base, base);
+      exponent >>= 1;
     }
 
     return result;

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.IntStream;
 
-public class Solution {
+public class Main {
   public static void main(String[] args) {
     Scanner sc = new Scanner(System.in);
 
@@ -31,17 +31,17 @@ public class Solution {
 
     Vertex[] leftVertices = new Vertex[n];
     for (int i = 0; i < leftVertices.length; ++i) {
-      leftVertices[i] = new Vertex(i);
+      leftVertices[i] = new Vertex();
     }
     Vertex[] rightVertices = new Vertex[n];
     for (int i = 0; i < rightVertices.length; ++i) {
-      rightVertices[i] = new Vertex(i);
+      rightVertices[i] = new Vertex();
     }
     for (int i = 0; i < n; ++i) {
       for (int j = 0; j < n; ++j) {
         if (isAbove(prices[i], prices[j])) {
-          leftVertices[i].adjacents.add(j);
-          rightVertices[j].adjacents.add(i);
+          leftVertices[i].adjs.add(j);
+          rightVertices[j].adjs.add(i);
         }
       }
     }
@@ -59,7 +59,7 @@ public class Solution {
 
   static boolean search(
       Vertex[] leftVertices, Vertex[] rightVertices, boolean[] rightVisited, int leftIndex) {
-    for (int rightIndex : leftVertices[leftIndex].adjacents) {
+    for (int rightIndex : leftVertices[leftIndex].adjs) {
       if (!rightVisited[rightIndex]) {
         rightVisited[rightIndex] = true;
 
@@ -78,16 +78,11 @@ public class Solution {
   }
 
   static boolean isAbove(int[] line1, int[] line2) {
-    return IntStream.range(0, line1.length).allMatch(i -> line1[i] < line2[i]);
+    return IntStream.range(0, line1.length).allMatch(i -> line1[i] > line2[i]);
   }
 }
 
 class Vertex {
-  int index;
-  List<Integer> adjacents = new ArrayList<>();
+  List<Integer> adjs = new ArrayList<>();
   int matching = -1;
-
-  Vertex(int index) {
-    this.index = index;
-  }
 }

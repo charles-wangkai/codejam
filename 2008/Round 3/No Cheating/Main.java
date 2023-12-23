@@ -58,8 +58,8 @@ public class Main {
             int adjR = r + R_OFFSETS[i];
             int adjC = c + C_OFFSETS[i];
             if (adjR >= 0 && adjR < M && adjC >= 0 && adjC < N && seats[adjR][adjC] == '.') {
-              vertices[r][c].adjacents.add(vertices[adjR][adjC].index);
-              vertices[adjR][adjC].adjacents.add(vertices[r][c].index);
+              vertices[r][c].adjs.add(vertices[adjR][adjC].index);
+              vertices[adjR][adjC].adjs.add(vertices[r][c].index);
             }
           }
         }
@@ -82,7 +82,7 @@ public class Main {
       List<Vertex> rightVertices,
       boolean[] rightVisited,
       int leftIndex) {
-    for (int rightIndex : leftVertices.get(leftIndex).adjacents) {
+    for (int rightIndex : leftVertices.get(leftIndex).adjs) {
       if (!rightVisited[rightIndex]) {
         rightVisited[rightIndex] = true;
 
@@ -106,7 +106,7 @@ public class Main {
 
 class Vertex {
   int index;
-  Set<Integer> adjacents = new HashSet<>();
+  Set<Integer> adjs = new HashSet<>();
   int matching = -1;
 
   Vertex(int index) {

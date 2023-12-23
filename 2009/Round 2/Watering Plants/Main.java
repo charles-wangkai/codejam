@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-public class Solution {
+public class Main {
   static final double EPSILON = 1e-9;
   static final int ITERATION_NUM = 100;
 
@@ -72,15 +72,17 @@ public class Solution {
   }
 
   static boolean coverAll(int[] X, int[] Y, int[] R, Point center1, Point center2, double radius) {
-    int N = X.length;
-
-    for (int i = 0; i < N; ++i) {
+    for (int i = 0; i < X.length; ++i) {
       if (!isIn(X[i], Y[i], R[i], center1, radius) && !isIn(X[i], Y[i], R[i], center2, radius)) {
         return false;
       }
     }
 
     return true;
+  }
+
+  static boolean isIn(int x, int y, int r, Point center, double radius) {
+    return computeDistance(x, y, center.x, center.y) + r <= radius + EPSILON;
   }
 
   static List<Point> computeCenters(int x1, int y1, int r1, int x2, int y2, int r2, double radius) {
@@ -90,39 +92,25 @@ public class Solution {
     double b = radius - r2;
     double c = computeDistance(x1, y1, x2, y2);
     if (a + b >= c && b + c >= a && c + a >= b) {
-      for (int factor : new int[] {-1, 1}) {
-        double x =
-            0.5 * (x1 + x2)
-                + (a * a - b * b) / (2 * c * c) * (x2 - x1)
-                + factor
-                    * 0.5
-                    * Math.sqrt(
-                        2 * (a * a + b * b) / (c * c)
-                            - (a * a - b * b) * (a * a - b * b) / (c * c * c * c)
-                            - 1)
-                    * (y2 - y1);
-        double y =
-            0.5 * (y1 + y2)
-                + (a * a - b * b) / (2 * c * c) * (y2 - y1)
-                + factor
-                    * 0.5
-                    * Math.sqrt(
-                        2 * (a * a + b * b) / (c * c)
-                            - (a * a - b * b) * (a * a - b * b) / (c * c * c * c)
-                            - 1)
-                    * (x1 - x2);
+      double p =
+          2 * (a * a + b * b) / (c * c) - (a * a - b * b) * (a * a - b * b) / (c * c * c * c) - 1;
+      if (p >= 0) {
+        for (int sign : new int[] {-1, 1}) {
+          double x =
+              0.5 * (x1 + x2)
+                  + (a * a - b * b) / (2 * c * c) * (x2 - x1)
+                  + sign * 0.5 * Math.sqrt(p) * (y2 - y1);
+          double y =
+              0.5 * (y1 + y2)
+                  + (a * a - b * b) / (2 * c * c) * (y2 - y1)
+                  + sign * 0.5 * Math.sqrt(p) * (x1 - x2);
 
-        if (!Double.isNaN(x) && !Double.isNaN(y)) {
           result.add(new Point(x, y));
         }
       }
     }
 
     return result;
-  }
-
-  static boolean isIn(int x, int y, int r, Point center, double radius) {
-    return computeDistance(x, y, center.x, center.y) + r <= radius + EPSILON;
   }
 
   static double computeDistance(double x1, double y1, double x2, double y2) {

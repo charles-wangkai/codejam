@@ -1,7 +1,7 @@
 import java.util.Scanner;
 import java.util.stream.IntStream;
 
-public class Solution {
+public class Main {
   public static void main(String[] args) {
     Scanner sc = new Scanner(System.in);
 
@@ -31,16 +31,17 @@ public class Solution {
     int total = computeLineSum(rowClues, (rowClues.length % 3 == 0) ? 1 : 0);
 
     int half = R / 2;
-    int[] topHalf = IntStream.range(0, R / 2).map(i -> rowClues[i]).toArray();
-    int[] downHalf =
-        IntStream.range(0, R / 2).map(i -> rowClues[rowClues.length - 1 - i]).toArray();
+    int[] topHalf = IntStream.range(0, half).map(i -> rowClues[i]).toArray();
+    int[] downHalf = IntStream.range(0, half).map(i -> rowClues[rowClues.length - 1 - i]).toArray();
+
     if (half % 3 == 0) {
       return total - computeLineSum(topHalf, 1) - computeLineSum(downHalf, 1);
-    } else if (half % 3 == 1) {
-      return computeLineSum(topHalf, 0) + computeLineSum(downHalf, 0) - total;
-    } else {
-      return total - computeLineSum(topHalf, 0) - computeLineSum(downHalf, 0);
     }
+    if (half % 3 == 1) {
+      return computeLineSum(topHalf, 0) + computeLineSum(downHalf, 0) - total;
+    }
+
+    return total - computeLineSum(topHalf, 0) - computeLineSum(downHalf, 0);
   }
 
   static int computeLineSum(int[] lineClues, int beginIndex) {

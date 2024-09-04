@@ -1,5 +1,6 @@
+// https://raw.githubusercontent.com/google/coding-competitions-archive/main/codejam/2009/round_3/football_team/analysis.pdf
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -9,59 +10,63 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Solution {
+public class Main {
   public static void main(String[] args) {
     Scanner sc = new Scanner(System.in);
 
     int T = sc.nextInt();
     for (int tc = 1; tc <= T; ++tc) {
       int N = sc.nextInt();
-      Point[] players = new Point[N];
-      for (int i = 0; i < players.length; ++i) {
-        int x = sc.nextInt();
-        int y = sc.nextInt();
-
-        players[i] = new Point(x, y);
+      int[] xs = new int[N];
+      int[] ys = new int[N];
+      for (int i = 0; i < N; ++i) {
+        xs[i] = sc.nextInt();
+        ys[i] = sc.nextInt();
       }
 
-      System.out.println(String.format("Case #%d: %d", tc, solve(players)));
+      System.out.println(String.format("Case #%d: %d", tc, solve(xs, ys)));
     }
 
     sc.close();
   }
 
-  static int solve(Point[] players) {
-    int N = players.length;
+  static int solve(int[] xs, int[] ys) {
+    int N = xs.length;
 
-    Arrays.sort(players, Comparator.comparing(p -> p.x));
+    int[] sortedIndices =
+        IntStream.range(0, N)
+            .boxed()
+            .sorted(Comparator.comparing(i -> xs[i]))
+            .mapToInt(Integer::intValue)
+            .toArray();
 
     boolean[][] edges = new boolean[N][N];
     Map<Integer, Integer> yToLastIndex = new HashMap<>();
-    for (int i = players.length - 1; i >= 0; --i) {
+    for (int i = sortedIndices.length - 1; i >= 0; --i) {
       for (int dy = -1; dy <= 1; ++dy) {
-        int adjY = players[i].y + dy;
+        int adjY = ys[sortedIndices[i]] + dy;
         if (yToLastIndex.containsKey(adjY)) {
-          edges[i][yToLastIndex.get(adjY)] = true;
-          edges[yToLastIndex.get(adjY)][i] = true;
+          edges[sortedIndices[i]][yToLastIndex.get(adjY)] = true;
+          edges[yToLastIndex.get(adjY)][sortedIndices[i]] = true;
         }
       }
 
-      yToLastIndex.put(players[i].y, i);
+      yToLastIndex.put(ys[sortedIndices[i]], sortedIndices[i]);
     }
 
     Map<Integer, List<Integer>> yToIndices = new HashMap<>();
-    for (int i = 0; i < players.length; ++i) {
-      if (!yToIndices.containsKey(players[i].y)) {
-        yToIndices.put(players[i].y, new ArrayList<>());
-      }
-      yToIndices.get(players[i].y).add(i);
+    for (int i = 0; i < sortedIndices.length; ++i) {
+      yToIndices.putIfAbsent(ys[sortedIndices[i]], new ArrayList<>());
+      yToIndices.get(ys[sortedIndices[i]]).add(sortedIndices[i]);
     }
 
     if (isOneColorable(edges)) {
       return 1;
-    } else if (isTwoColorable(edges, yToIndices)) {
+    }
+    if (isTwoColorable(edges, yToIndices)) {
       return 2;
-    } else if (isThreeColorable(edges, yToIndices)) {
+    }
+    if (isThreeColorable(edges, yToIndices)) {
       return 3;
     }
 
@@ -84,9 +89,9 @@ public class Solution {
 
   static boolean isTwoColorable(boolean[][] edges, Map<Integer, List<Integer>> yToIndices) {
     for (int y : yToIndices.keySet()) {
-      for (int center : yToIndices.get(y)) {
-        if (findConnectedIndices(edges, yToIndices, y - 1, center).size() >= 2
-            || findConnectedIndices(edges, yToIndices, y + 1, center).size() >= 2) {
+      for (int index : yToIndices.get(y)) {
+        if (findConnectedIndices(edges, yToIndices, y - 1, index).size() >= 2
+            || findConnectedIndices(edges, yToIndices, y + 1, index).size() >= 2) {
           return false;
         }
       }
@@ -106,7 +111,7 @@ public class Solution {
         surroundingIndices.addAll(
             reversed(findConnectedIndices(edges, yToIndices, y + 1, indices.get(i))));
 
-        if (isInnerVertex(edges, surroundingIndices) && surroundingIndices.size() % 2 != 0) {
+        if (isInnerVertex(edges, surroundingIndices) && surroundingIndices.size() % 2 == 1) {
           return false;
         }
       }
@@ -116,9 +121,9 @@ public class Solution {
   }
 
   static List<Integer> findConnectedIndices(
-      boolean[][] edges, Map<Integer, List<Integer>> yToIndices, int y, int center) {
+      boolean[][] edges, Map<Integer, List<Integer>> yToIndices, int y, int index) {
     return yToIndices.getOrDefault(y, List.of()).stream()
-        .filter(x -> edges[center][x])
+        .filter(p -> edges[index][p])
         .collect(Collectors.toList());
   }
 
@@ -134,15 +139,5 @@ public class Solution {
             i ->
                 edges[surroundingIndices.get(i)][
                     surroundingIndices.get((i + 1) % surroundingIndices.size())]);
-  }
-}
-
-class Point {
-  int x;
-  int y;
-
-  Point(int x, int y) {
-    this.x = x;
-    this.y = y;
   }
 }

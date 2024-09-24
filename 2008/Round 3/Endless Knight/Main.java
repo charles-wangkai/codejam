@@ -11,7 +11,7 @@ public class Main {
   static short[] factorialExponents;
 
   public static void main(String[] args) {
-    init();
+    precompute();
 
     Scanner sc = new Scanner(System.in);
 
@@ -33,12 +33,28 @@ public class Main {
     sc.close();
   }
 
+  static void precompute() {
+    factorialMods = new short[LIMIT + 1];
+    factorialMods[0] = 1;
+    factorialExponents = new short[factorialMods.length];
+    for (int i = 1; i < factorialMods.length; ++i) {
+      factorialExponents[i] = factorialExponents[i - 1];
+      int rest = i;
+      while (rest % MODULUS == 0) {
+        ++factorialExponents[i];
+        rest /= MODULUS;
+      }
+
+      factorialMods[i] = (short) multiplyMod(factorialMods[i - 1], rest % MODULUS);
+    }
+  }
+
   static int solve(int H, int W, int[] r, int[] c) {
     int[] sortedRockIndices =
         IntStream.range(0, r.length)
             .boxed()
             .sorted(Comparator.comparing(i -> r[i]))
-            .mapToInt(x -> x)
+            .mapToInt(Integer::intValue)
             .toArray();
 
     int result = computeWayNums(H - 1, W - 1);
@@ -46,7 +62,7 @@ public class Main {
       int mask_ = mask;
       int[] indices =
           IntStream.range(0, sortedRockIndices.length)
-              .filter(i -> (mask_ & (1 << i)) != 0)
+              .filter(i -> ((mask_ >> i) & 1) == 1)
               .map(i -> sortedRockIndices[i])
               .toArray();
 
@@ -79,22 +95,6 @@ public class Main {
     }
 
     return C(sum, num1);
-  }
-
-  static void init() {
-    factorialMods = new short[LIMIT + 1];
-    factorialMods[0] = 1;
-    factorialExponents = new short[factorialMods.length];
-    for (int i = 1; i < factorialMods.length; ++i) {
-      factorialExponents[i] = factorialExponents[i - 1];
-      int rest = i;
-      while (rest % MODULUS == 0) {
-        ++factorialExponents[i];
-        rest /= MODULUS;
-      }
-
-      factorialMods[i] = (short) multiplyMod(factorialMods[i - 1], rest % MODULUS);
-    }
   }
 
   static int addMod(int x, int y) {

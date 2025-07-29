@@ -1,10 +1,12 @@
+// https://raw.githubusercontent.com/google/coding-competitions-archive/main/codejam/2008/apac_semifinal/modern_art_plagiarism/analysis.pdf
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-public class Solution {
+public class Main {
   public static void main(String[] args) {
     Scanner sc = new Scanner(System.in);
 
@@ -22,6 +24,7 @@ public class Solution {
 
   static List<Integer>[] readTree(Scanner sc) {
     int size = sc.nextInt();
+
     @SuppressWarnings("unchecked")
     List<Integer>[] adjLists = new List[size];
     for (int i = 0; i < adjLists.length; ++i) {
@@ -29,11 +32,11 @@ public class Solution {
     }
 
     for (int i = 0; i < size - 1; ++i) {
-      int v1 = sc.nextInt() - 1;
-      int v2 = sc.nextInt() - 1;
+      int v1 = sc.nextInt();
+      int v2 = sc.nextInt();
 
-      adjLists[v1].add(v2);
-      adjLists[v2].add(v1);
+      adjLists[v1 - 1].add(v2 - 1);
+      adjLists[v2 - 1].add(v1 - 1);
     }
 
     return adjLists;
@@ -43,14 +46,10 @@ public class Solution {
     @SuppressWarnings("unchecked")
     List<Integer>[] smallChildLists = new List[smallAdjLists.length];
     Map<Integer, List<Integer>> smallDepthToVertices = new HashMap<>();
-    search(
-        smallAdjLists,
-        smallChildLists,
-        smallDepthToVertices,
-        new boolean[smallAdjLists.length],
-        0,
-        0);
-    int smallMaxDepth = smallDepthToVertices.keySet().stream().mapToInt(x -> x).max().getAsInt();
+    search(smallAdjLists, smallChildLists, smallDepthToVertices, -1, 0, 0);
+
+    int smallMaxDepth =
+        smallDepthToVertices.keySet().stream().mapToInt(Integer::intValue).max().getAsInt();
 
     for (int largeRoot = 0; largeRoot < largeAdjLists.length; ++largeRoot) {
       boolean[][] matched = new boolean[smallAdjLists.length][largeAdjLists.length];
@@ -58,19 +57,13 @@ public class Solution {
       @SuppressWarnings("unchecked")
       List<Integer>[] largeChildLists = new List[largeAdjLists.length];
       Map<Integer, List<Integer>> largeDepthToVertices = new HashMap<>();
-      search(
-          largeAdjLists,
-          largeChildLists,
-          largeDepthToVertices,
-          new boolean[largeAdjLists.length],
-          largeRoot,
-          0);
+      search(largeAdjLists, largeChildLists, largeDepthToVertices, -1, largeRoot, 0);
 
       for (int depth = smallMaxDepth; depth >= 0; --depth) {
         for (int smallVertex : smallDepthToVertices.get(depth)) {
           for (int largeVertex : largeDepthToVertices.getOrDefault(depth, List.of())) {
             matched[smallVertex][largeVertex] =
-                isMatched(matched, smallChildLists, largeChildLists, smallVertex, largeVertex);
+                isMatched(matched, smallChildLists[smallVertex], largeChildLists[largeVertex]);
           }
         }
       }
@@ -84,14 +77,10 @@ public class Solution {
   }
 
   static boolean isMatched(
-      boolean[][] matched,
-      List<Integer>[] smallChildLists,
-      List<Integer>[] largeChildLists,
-      int smallVertex,
-      int largeVertex) {
+      boolean[][] matched, List<Integer> smallChildList, List<Integer> largeChildList) {
     List<Vertex> leftVertices = new ArrayList<>();
     Map<Integer, Vertex> smallChildToVertex = new HashMap<>();
-    for (int smallChild : smallChildLists[smallVertex]) {
+    for (int smallChild : smallChildList) {
       Vertex vertex = new Vertex(leftVertices.size());
       leftVertices.add(vertex);
       smallChildToVertex.put(smallChild, vertex);
@@ -99,14 +88,14 @@ public class Solution {
 
     List<Vertex> rightVertices = new ArrayList<>();
     Map<Integer, Vertex> largeChildToVertex = new HashMap<>();
-    for (int largeChild : largeChildLists[largeVertex]) {
+    for (int largeChild : largeChildList) {
       Vertex vertex = new Vertex(rightVertices.size());
       rightVertices.add(vertex);
       largeChildToVertex.put(largeChild, vertex);
     }
 
-    for (int smallChild : smallChildLists[smallVertex]) {
-      for (int largeChild : largeChildLists[largeVertex]) {
+    for (int smallChild : smallChildList) {
+      for (int largeChild : largeChildList) {
         if (matched[smallChild][largeChild]) {
           smallChildToVertex
               .get(smallChild)
@@ -161,21 +150,17 @@ public class Solution {
       List<Integer>[] adjLists,
       List<Integer>[] childLists,
       Map<Integer, List<Integer>> depthToVertices,
-      boolean[] visited,
-      int v,
+      int parent,
+      int node,
       int depth) {
-    visited[v] = true;
+    depthToVertices.putIfAbsent(depth, new ArrayList<>());
+    depthToVertices.get(depth).add(node);
 
-    if (!depthToVertices.containsKey(depth)) {
-      depthToVertices.put(depth, new ArrayList<>());
-    }
-    depthToVertices.get(depth).add(v);
-
-    childLists[v] = new ArrayList<>();
-    for (int adj : adjLists[v]) {
-      if (!visited[adj]) {
-        childLists[v].add(adj);
-        search(adjLists, childLists, depthToVertices, visited, adj, depth + 1);
+    childLists[node] = new ArrayList<>();
+    for (int adj : adjLists[node]) {
+      if (adj != parent) {
+        childLists[node].add(adj);
+        search(adjLists, childLists, depthToVertices, node, adj, depth + 1);
       }
     }
   }

@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.IntStream;
 
-public class Solution {
+public class Main {
   public static void main(String[] args) {
     Scanner sc = new Scanner(System.in);
 
@@ -21,12 +21,16 @@ public class Solution {
         if (i == 0) {
           recipe = mixture;
         }
-        mixtureToIngredients.put(mixture, new ArrayList<>());
+
+        List<String> ingredients = new ArrayList<>();
         int M = sc.nextInt();
         for (int j = 0; j < M; ++j) {
           String ingredient = sc.next();
-          mixtureToIngredients.get(mixture).add(ingredient);
+
+          ingredients.add(ingredient);
         }
+
+        mixtureToIngredients.put(mixture, ingredients);
       }
 
       System.out.println(String.format("Case #%d: %d", tc, solve(recipe, mixtureToIngredients)));

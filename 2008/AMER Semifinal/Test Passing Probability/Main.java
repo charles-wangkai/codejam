@@ -6,7 +6,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.IntStream;
 
-public class Solution {
+public class Main {
   static final int CHOICE_NUM = 4;
 
   public static void main(String[] args) {
@@ -35,30 +35,32 @@ public class Solution {
           Arrays.stream(p[i])
               .boxed()
               .sorted(Comparator.reverseOrder())
-              .mapToDouble(x -> x)
+              .mapToDouble(Double::doubleValue)
               .toArray();
     }
 
     double result = 0;
-    Set<Long> visited = new HashSet<>();
-    visited.add(0L);
+    Set<Long> seen = new HashSet<>();
+    seen.add(0L);
     PriorityQueue<Element> pq =
-        new PriorityQueue<>(Comparator.comparing((Element e) -> e.prob).reversed());
+        new PriorityQueue<>(Comparator.<Element, Double>comparing(e -> e.prob).reversed());
     pq.offer(new Element(computeProb(p, new int[p.length]), 0));
     for (int i = 0; i < M && !pq.isEmpty(); ++i) {
       Element head = pq.poll();
       result += head.prob;
-      int[] indices = decode(p.length, head.code);
 
+      int[] indices = decode(p.length, head.code);
       for (int j = 0; j < p.length; ++j) {
         ++indices[j];
+
         if (indices[j] != CHOICE_NUM) {
           long code = encode(indices);
-          if (!visited.contains(code)) {
-            visited.add(code);
+          if (!seen.contains(code)) {
+            seen.add(code);
             pq.offer(new Element(computeProb(p, indices), code));
           }
         }
+
         --indices[j];
       }
     }
@@ -69,7 +71,7 @@ public class Solution {
   static double computeProb(double[][] p, int[] indices) {
     return IntStream.range(0, p.length)
         .mapToDouble(i -> p[i][indices[i]])
-        .reduce((x, y) -> x * y)
+        .reduce((acc, x) -> acc * x)
         .getAsDouble();
   }
 

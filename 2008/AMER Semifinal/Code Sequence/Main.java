@@ -1,9 +1,11 @@
+// https://raw.githubusercontent.com/google/coding-competitions-archive/main/codejam/2008/amer_semifinal/code_sequence/analysis.pdf
+
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Solution {
+public class Main {
   static final int MODULUS = 10007;
 
   public static void main(String[] args) {
@@ -24,28 +26,31 @@ public class Solution {
   }
 
   static String solve(int[] S) {
-    Element result = search(S);
+    int result = search(S);
 
-    return result.nextDetermined ? String.valueOf(result.nextValue) : "UNKNOWN";
+    return (result == Integer.MAX_VALUE) ? "UNKNOWN" : String.valueOf(result);
   }
 
-  static Element search(int[] sequence) {
+  static Integer search(int[] sequence) {
     if (sequence.length <= 2) {
-      return new Element(true, false, -1);
+      return Integer.MAX_VALUE;
     }
 
-    boolean valid = false;
     int nextValue = -1;
     for (int beginIndex = 0; beginIndex <= 1; ++beginIndex) {
       int[] nextSequence = buildNextSequence(sequence, beginIndex);
       if (nextSequence != null) {
-        Element subResult = search(nextSequence);
-        if (subResult.valid) {
-          valid = true;
+        Integer subResult = search(nextSequence);
+        if (subResult != null) {
+          if (beginIndex == sequence.length % 2) {
+            if (subResult == Integer.MAX_VALUE || (nextValue != -1 && subResult != nextValue)) {
+              return Integer.MAX_VALUE;
+            }
 
-          if (beginIndex % 2 != sequence.length % 2) {
+            nextValue = subResult;
+          } else {
             if (beginIndex + 1 == sequence.length) {
-              return new Element(true, false, -1);
+              return Integer.MAX_VALUE;
             }
 
             int currNextValue =
@@ -54,23 +59,16 @@ public class Solution {
                     subtractMod(sequence[beginIndex + 1], sequence[beginIndex]));
 
             if (nextValue != -1 && currNextValue != nextValue) {
-              return new Element(true, false, -1);
+              return Integer.MAX_VALUE;
             }
 
             nextValue = currNextValue;
-          } else {
-            if (!subResult.nextDetermined
-                || (nextValue != -1 && subResult.nextValue != nextValue)) {
-              return new Element(true, false, -1);
-            }
-
-            nextValue = subResult.nextValue;
           }
         }
       }
     }
 
-    return new Element(valid, true, nextValue);
+    return (nextValue == -1) ? null : nextValue;
   }
 
   static int[] buildNextSequence(int[] sequence, int beginIndex) {
@@ -86,7 +84,7 @@ public class Solution {
 
     List<Integer> nextSequence =
         IntStream.range(0, sequence.length)
-            .filter(i -> i % 2 == beginIndex % 2)
+            .filter(i -> i % 2 == beginIndex)
             .map(i -> sequence[i])
             .boxed()
             .collect(Collectors.toList());
@@ -94,26 +92,14 @@ public class Solution {
       nextSequence.add(0, subtractMod(sequence[0], diff));
     }
 
-    return nextSequence.stream().mapToInt(x -> x).toArray();
+    return nextSequence.stream().mapToInt(Integer::intValue).toArray();
   }
 
   static int addMod(int x, int y) {
-    return (x + y) % MODULUS;
+    return Math.floorMod(x + y, MODULUS);
   }
 
   static int subtractMod(int x, int y) {
-    return (x - y + MODULUS) % MODULUS;
-  }
-}
-
-class Element {
-  boolean valid;
-  boolean nextDetermined;
-  int nextValue;
-
-  Element(boolean valid, boolean nextDetermined, int nextValue) {
-    this.valid = valid;
-    this.nextDetermined = nextDetermined;
-    this.nextValue = nextValue;
+    return addMod(x, -y);
   }
 }

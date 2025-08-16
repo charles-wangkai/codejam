@@ -1,9 +1,10 @@
+// https://raw.githubusercontent.com/google/coding-competitions-archive/main/codejam/2008/emea_semifinal/scaled_triangle/analysis.pdf
 // https://en.wikipedia.org/wiki/Banach_fixed-point_theorem
 // https://aaronschlegel.me/calculate-matrix-inverse-2x2-3x3.html
 
 import java.util.Scanner;
 
-public class Solution {
+public class Main {
   static final int SIZE = 3;
   static final double EPSILON = 1e-7;
 
@@ -39,6 +40,7 @@ public class Solution {
     double[][] t =
         multiply(
             p, inverse(new double[][] {{x1[0], x2[0], x3[0]}, {y1[0], y2[0], y3[0]}, {1, 1, 1}}));
+
     while (true) {
       double[][] nextP = multiply(t, p);
       if (isClose(p, nextP)) {

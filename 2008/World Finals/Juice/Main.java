@@ -2,14 +2,14 @@ import java.util.Comparator;
 import java.util.Scanner;
 import java.util.stream.IntStream;
 
-public class Solution {
+public class Main {
   static final int FULL = 10000;
 
   public static void main(String[] args) {
     Scanner sc = new Scanner(System.in);
 
     int T = sc.nextInt();
-    for (int tc = 1; tc <= T; ++tc) {
+    for (int tc = 0; tc < T; ++tc) {
       int N = sc.nextInt();
       int[] A = new int[N];
       int[] B = new int[N];
@@ -20,7 +20,7 @@ public class Solution {
         C[i] = sc.nextInt();
       }
 
-      System.out.println(String.format("Case #%d: %d", tc, solve(A, B, C)));
+      System.out.println(String.format("Case #%d: %d", tc + 1, solve(A, B, C)));
     }
 
     sc.close();
@@ -31,43 +31,39 @@ public class Solution {
 
     int result = 0;
     for (int fractionA : A) {
-      int[] X = new int[FULL + 2];
       int[] sortedIndices =
           IntStream.range(0, N)
               .filter(i -> A[i] <= fractionA)
               .boxed()
               .sorted(Comparator.comparing(i -> B[i]))
-              .mapToInt(x -> x)
+              .mapToInt(Integer::intValue)
               .toArray();
-      for (int index : sortedIndices) {
-        int fractionB = B[index];
-        add(X, C[index] + 1, 1);
 
-        result = Math.max(result, sum(X, FULL - fractionA - fractionB + 1));
+      int[] binaryIndexedTree = new int[Integer.highestOneBit(FULL + 1) * 2 + 1];
+      for (int index : sortedIndices) {
+        add(binaryIndexedTree, C[index] + 1, 1);
+
+        result = Math.max(result, computeSum(binaryIndexedTree, FULL - fractionA - B[index] + 1));
       }
     }
 
     return result;
   }
 
-  static int LSB(int i) {
-    return i & -i;
+  static void add(int[] binaryIndexedTree, int i, int x) {
+    while (i < binaryIndexedTree.length) {
+      binaryIndexedTree[i] += x;
+      i += i & -i;
+    }
   }
 
-  static int sum(int[] X, int i) {
-    int sum = 0;
+  static int computeSum(int[] binaryIndexedTree, int i) {
+    int result = 0;
     while (i > 0) {
-      sum += X[i];
-      i -= LSB(i);
+      result += binaryIndexedTree[i];
+      i -= i & -i;
     }
 
-    return sum;
-  }
-
-  static void add(int[] X, int i, int k) {
-    while (i < X.length) {
-      X[i] += k;
-      i += LSB(i);
-    }
+    return result;
   }
 }

@@ -1,14 +1,21 @@
+// https://raw.githubusercontent.com/google/coding-competitions-archive/main/codejam/2008/world_finals/ping_pong_balls/analysis.pdf
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.Set;
 
-public class Solution {
+public class Main implements Runnable {
   public static void main(String[] args) {
+    new Thread(null, new Main(), "Main", 1 << 28).start();
+  }
+
+  @Override
+  public void run() {
     Scanner sc = new Scanner(System.in);
 
     int C = sc.nextInt();
-    for (int tc = 1; tc <= C; ++tc) {
+    for (int tc = 0; tc < C; ++tc) {
       int W = sc.nextInt();
       int H = sc.nextInt();
       int DX1 = sc.nextInt();
@@ -19,7 +26,7 @@ public class Solution {
       int Y0 = sc.nextInt();
 
       System.out.println(
-          String.format("Case #%d: %d", tc, solve(W, H, DX1, DY1, DX2, DY2, X0, Y0)));
+          String.format("Case #%d: %d", tc + 1, solve(W, H, DX1, DY1, DX2, DY2, X0, Y0)));
     }
 
     sc.close();
@@ -32,23 +39,23 @@ public class Solution {
 
     int bMin = 0;
     int bMax = 0;
-    while (isIn(W, H, X0 + (bMax + 1) * DX2, Y0 + (bMax + 1) * DY2)) {
+    while (isIn(W, H, DX1, DY1, DX2, DY2, X0, Y0, 0, bMax + 1)) {
       ++bMax;
     }
 
     long result = bMax - bMin + 1;
     for (int a = 1; ; ++a) {
-      while (bMin <= bMax && !isIn(W, H, X0 + a * DX1 + bMin * DX2, Y0 + a * DY1 + bMin * DY2)) {
+      while (bMin <= bMax && !isIn(W, H, DX1, DY1, DX2, DY2, X0, Y0, a, bMin)) {
         ++bMin;
       }
       if (bMin == bMax + 1) {
         break;
       }
 
-      while (!isIn(W, H, X0 + a * DX1 + bMax * DX2, Y0 + a * DY1 + bMax * DY2)) {
+      while (!isIn(W, H, DX1, DY1, DX2, DY2, X0, Y0, a, bMax)) {
         --bMax;
       }
-      while (isIn(W, H, X0 + a * DX1 + (bMax + 1) * DX2, Y0 + a * DY1 + (bMax + 1) * DY2)) {
+      while (isIn(W, H, DX1, DY1, DX2, DY2, X0, Y0, a, bMax + 1)) {
         ++bMax;
       }
 
@@ -58,12 +65,16 @@ public class Solution {
     return result;
   }
 
-  static boolean isIn(int W, int H, int x, int y) {
+  static boolean isIn(
+      int W, int H, int DX1, int DY1, int DX2, int DY2, int X0, int Y0, int a, int b) {
+    int x = X0 + a * DX1 + b * DX2;
+    int y = Y0 + a * DY1 + b * DY2;
+
     return x >= 0 && x < W && y >= 0 && y < H;
   }
 
   static boolean isCollinear(int x1, int y1, int x2, int y2) {
-    return (long) x1 * y2 == (long) y1 * x2;
+    return x1 * y2 == y1 * x2;
   }
 
   static int search(

@@ -1,10 +1,8 @@
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Queue;
 import java.util.Scanner;
-import java.util.stream.IntStream;
 
-public class Solution {
+public class Main {
   static final int[] R_OFFSETS = {-1, 0, 1, 0};
   static final int[] C_OFFSETS = {0, 1, 0, -1};
 
@@ -12,7 +10,7 @@ public class Solution {
     Scanner sc = new Scanner(System.in);
 
     int T = sc.nextInt();
-    for (int tc = 1; tc <= T; ++tc) {
+    for (int tc = 0; tc < T; ++tc) {
       int N = sc.nextInt();
       int M = sc.nextInt();
       char[][] cells = new char[N][M];
@@ -23,7 +21,7 @@ public class Solution {
         }
       }
 
-      System.out.println(String.format("Case #%d: %d", tc, solve(cells)));
+      System.out.println(String.format("Case #%d: %d", tc + 1, solve(cells)));
     }
 
     sc.close();
@@ -40,10 +38,10 @@ public class Solution {
       }
     }
 
-    int delta = 0;
+    int result = 0;
     boolean[][] visitedForests = new boolean[N][M];
     while (true) {
-      Element nearest = findNearest(cells, visitedForests);
+      Element nearest = findNearestForest(cells, visitedForests);
       if (nearest == null) {
         break;
       }
@@ -57,17 +55,23 @@ public class Solution {
         }
       }
 
-      for (int i = 0; i <= nearest.pathDistance; ++i) {
-        delta += Math.max(0, i - Math.min(i, nearest.pathDistance - i));
+      for (int d = 0; d <= nearest.pathDistance; ++d) {
+        result += d - Math.min(d, nearest.pathDistance - d);
       }
     }
 
-    return IntStream.range(0, N).map(r -> Arrays.stream(minDistances[r]).sum()).sum() + delta;
+    for (int r = 0; r < N; ++r) {
+      for (int c = 0; c < M; ++c) {
+        result += minDistances[r][c];
+      }
+    }
+
+    return result;
   }
 
-  static Element findNearest(char[][] cells, boolean[][] visitedForests) {
-    int N = visitedForests.length;
-    int M = visitedForests[0].length;
+  static Element findNearestForest(char[][] cells, boolean[][] visitedForests) {
+    int N = cells.length;
+    int M = cells[0].length;
 
     int[][] distances = new int[N][M];
     boolean[][] visited = new boolean[N][M];
@@ -115,8 +119,10 @@ public class Solution {
     int M = cells[0].length;
 
     int[][] distanceMap = new int[N][M];
+
     boolean[][] visited = new boolean[N][M];
     visited[forest.r][forest.c] = true;
+
     Queue<Point> queue = new ArrayDeque<>();
     queue.offer(new Point(forest.r, forest.c));
 

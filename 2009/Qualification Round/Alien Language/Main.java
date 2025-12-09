@@ -4,7 +4,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.IntStream;
 
-public class Solution {
+public class Main {
   public static void main(String[] args) {
     Scanner sc = new Scanner(System.in);
 
@@ -15,10 +15,10 @@ public class Solution {
     for (int i = 0; i < words.length; ++i) {
       words[i] = sc.next();
     }
-    for (int tc = 1; tc <= N; ++tc) {
+    for (int tc = 0; tc < N; ++tc) {
       String pattern = sc.next();
 
-      System.out.println(String.format("Case #%d: %d", tc, solve(L, words, pattern)));
+      System.out.println(String.format("Case #%d: %d", tc + 1, solve(L, words, pattern)));
     }
 
     sc.close();
@@ -43,13 +43,13 @@ public class Solution {
 
     int index = 0;
     boolean inGroup = false;
-    for (char ch : pattern.toCharArray()) {
-      if (ch == '(') {
+    for (char c : pattern.toCharArray()) {
+      if (c == '(') {
         inGroup = true;
-      } else if (ch == ')') {
+      } else if (c == ')') {
         inGroup = false;
       } else {
-        letterSets[index].add(ch);
+        letterSets[index].add(c);
       }
 
       if (!inGroup) {

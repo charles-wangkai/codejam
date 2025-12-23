@@ -3,12 +3,12 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Scanner;
 
-public class Solution {
+public class Main {
   public static void main(String[] args) {
     Scanner sc = new Scanner(System.in);
 
     int C = sc.nextInt();
-    for (int tc = 1; tc <= C; ++tc) {
+    for (int tc = 0; tc < C; ++tc) {
       int N = sc.nextInt();
       int M = sc.nextInt();
       int[][] S = new int[N][M];
@@ -22,7 +22,7 @@ public class Solution {
         }
       }
 
-      System.out.println(String.format("Case #%d: %d", tc, solve(S, W, T)));
+      System.out.println(String.format("Case #%d: %d", tc + 1, solve(S, W, T)));
     }
 
     sc.close();
@@ -36,6 +36,7 @@ public class Solution {
     for (int r = 0; r < times.length; ++r) {
       Arrays.fill(times[r], -1);
     }
+
     PriorityQueue<Element> pq = new PriorityQueue<>(Comparator.comparing(e -> e.time));
     pq.offer(new Element(N * 2 - 1, 0, 0));
 
@@ -52,24 +53,22 @@ public class Solution {
             pq.offer(new Element(head.r - 1, head.c, head.time + 2));
           }
 
-          if (head.r != N * 2 - 1) {
-            pq.offer(
-                new Element(
-                    head.r + 1,
-                    head.c,
-                    computeCrossTime(
-                        S[intersectionR][intersectionC],
-                        W[intersectionR][intersectionC],
-                        T[intersectionR][intersectionC],
-                        head.time,
-                        true)));
-          }
+          pq.offer(
+              new Element(
+                  head.r + 1,
+                  head.c,
+                  computeCrossArrivingTime(
+                      S[intersectionR][intersectionC],
+                      W[intersectionR][intersectionC],
+                      T[intersectionR][intersectionC],
+                      head.time,
+                      true)));
         } else {
           pq.offer(
               new Element(
                   head.r - 1,
                   head.c,
-                  computeCrossTime(
+                  computeCrossArrivingTime(
                       S[intersectionR][intersectionC],
                       W[intersectionR][intersectionC],
                       T[intersectionR][intersectionC],
@@ -86,24 +85,22 @@ public class Solution {
             pq.offer(new Element(head.r, head.c - 1, head.time + 2));
           }
 
-          if (head.c != M * 2 - 1) {
-            pq.offer(
-                new Element(
-                    head.r,
-                    head.c + 1,
-                    computeCrossTime(
-                        S[intersectionR][intersectionC],
-                        W[intersectionR][intersectionC],
-                        T[intersectionR][intersectionC],
-                        head.time,
-                        false)));
-          }
+          pq.offer(
+              new Element(
+                  head.r,
+                  head.c + 1,
+                  computeCrossArrivingTime(
+                      S[intersectionR][intersectionC],
+                      W[intersectionR][intersectionC],
+                      T[intersectionR][intersectionC],
+                      head.time,
+                      false)));
         } else {
           pq.offer(
               new Element(
                   head.r,
                   head.c - 1,
-                  computeCrossTime(
+                  computeCrossArrivingTime(
                       S[intersectionR][intersectionC],
                       W[intersectionR][intersectionC],
                       T[intersectionR][intersectionC],
@@ -120,27 +117,13 @@ public class Solution {
     return times[0][M * 2 - 1];
   }
 
-  static int computeCrossTime(int s, int w, int t, int time, boolean verticalOrHorizontal) {
+  static int computeCrossArrivingTime(int s, int w, int t, int time, boolean verticalOrHorizontal) {
     int cycle = s + w;
 
-    int base = t + (verticalOrHorizontal ? 0 : s);
-    base -= (base + cycle - 1) / cycle * cycle;
-    base += (time - base) / cycle * cycle;
+    int delta = Math.floorMod(time - (t + (verticalOrHorizontal ? 0 : s)), cycle);
+    int base = time - delta;
 
-    int delta = time - base;
-    if (verticalOrHorizontal) {
-      if (delta < s) {
-        return time + 1;
-      } else {
-        return base + cycle + 1;
-      }
-    } else {
-      if (delta < w) {
-        return time + 1;
-      } else {
-        return base + cycle + 1;
-      }
-    }
+    return ((delta < (verticalOrHorizontal ? s : w)) ? time : (base + cycle)) + 1;
   }
 }
 

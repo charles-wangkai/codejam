@@ -3,12 +3,12 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Solution {
+public class Main {
   public static void main(String[] args) {
     Scanner sc = new Scanner(System.in);
 
     int N = sc.nextInt();
-    for (int tc = 1; tc <= N; ++tc) {
+    for (int tc = 0; tc < N; ++tc) {
       int L = sc.nextInt();
       sc.nextLine();
       String[] lines = new String[L];
@@ -29,7 +29,7 @@ public class Solution {
         animals[i] = new Animal(name, features);
       }
 
-      System.out.println(String.format("Case #%d:\n%s", tc, solve(definition, animals)));
+      System.out.println(String.format("Case #%d:\n%s", tc + 1, solve(definition, animals)));
     }
 
     sc.close();
@@ -48,7 +48,7 @@ public class Solution {
                 String.format(
                     "%.9f",
                     computeProbability(
-                        decisionTree, Arrays.stream(animal.features).collect(Collectors.toSet()))))
+                        Arrays.stream(animal.features).collect(Collectors.toSet()), decisionTree)))
         .collect(Collectors.joining("\n"));
   }
 
@@ -57,9 +57,9 @@ public class Solution {
     if (beginIndex + 2 != endIndex) {
       node.feature = tokens[beginIndex + 2];
 
-      int depth = 1;
-      int index = beginIndex + 4;
-      while (depth != 0) {
+      int depth = 0;
+      int index = beginIndex + 3;
+      do {
         if (tokens[index].equals("(")) {
           ++depth;
         } else if (tokens[index].equals(")")) {
@@ -67,7 +67,7 @@ public class Solution {
         }
 
         ++index;
-      }
+      } while (depth != 0);
 
       node.subTree1 = buildDecisionTree(tokens, beginIndex + 3, index - 1);
       node.subTree2 = buildDecisionTree(tokens, index, endIndex - 1);
@@ -76,15 +76,12 @@ public class Solution {
     return node;
   }
 
-  static double computeProbability(Node decisionTree, Set<String> features) {
-    double result = decisionTree.weight;
-    if (decisionTree.feature != null) {
+  static double computeProbability(Set<String> features, Node node) {
+    double result = node.weight;
+    if (node.feature != null) {
       result *=
           computeProbability(
-              features.contains(decisionTree.feature)
-                  ? decisionTree.subTree1
-                  : decisionTree.subTree2,
-              features);
+              features, features.contains(node.feature) ? node.subTree1 : node.subTree2);
     }
 
     return result;

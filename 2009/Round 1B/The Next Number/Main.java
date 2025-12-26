@@ -1,15 +1,16 @@
 import java.util.Scanner;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-public class Solution {
+public class Main {
   public static void main(String[] args) {
     Scanner sc = new Scanner(System.in);
 
     int T = sc.nextInt();
-    for (int tc = 1; tc <= T; ++tc) {
+    for (int tc = 0; tc < T; ++tc) {
       String N = sc.next();
 
-      System.out.println(String.format("Case #%d: %s", tc, solve(N)));
+      System.out.println(String.format("Case #%d: %s", tc + 1, solve(N)));
     }
 
     sc.close();
@@ -27,13 +28,15 @@ public class Solution {
       String sorted =
           N.chars()
               .sorted()
-              .mapToObj(ch -> String.valueOf((char) ch))
+              .mapToObj(c -> (char) c)
+              .map(String::valueOf)
               .collect(Collectors.joining());
 
-      int index = 0;
-      while (sorted.charAt(index) == '0') {
-        ++index;
-      }
+      int index =
+          IntStream.range(0, sorted.length())
+              .filter(i -> sorted.charAt(i) != '0')
+              .findFirst()
+              .getAsInt();
 
       return String.format(
           "%c0%s%s", sorted.charAt(index), sorted.substring(0, index), sorted.substring(index + 1));
@@ -50,7 +53,7 @@ public class Solution {
       swap(digits, i, j);
     }
 
-    return new String(digits);
+    return String.valueOf(digits);
   }
 
   static void swap(char[] digits, int index1, int index2) {

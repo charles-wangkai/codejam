@@ -1,12 +1,12 @@
 import java.util.Scanner;
 import java.util.stream.IntStream;
 
-public class Solution {
+public class Main {
   public static void main(String[] args) {
     Scanner sc = new Scanner(System.in);
 
     int N = sc.nextInt();
-    for (int tc = 1; tc <= N; ++tc) {
+    for (int tc = 0; tc < N; ++tc) {
       int R = sc.nextInt();
       int C = sc.nextInt();
       int F = sc.nextInt();
@@ -18,7 +18,7 @@ public class Solution {
         }
       }
 
-      System.out.println(String.format("Case #%d: %s", tc, solve(cave, F)));
+      System.out.println(String.format("Case #%d: %s", tc + 1, solve(cave, F)));
     }
 
     sc.close();
@@ -44,63 +44,52 @@ public class Solution {
           if (digNums[r][beginIndex][endIndex] != Integer.MAX_VALUE) {
             for (int c : new int[] {beginIndex, endIndex}) {
               if (cave[r + 1][c] == '.') {
-                int nextR = r + 1;
-                while (nextR != R - 1 && cave[nextR + 1][c] == '.') {
-                  ++nextR;
-                }
-
-                if (nextR - r <= F) {
-                  int nextBeginIndex = findBeginIndex(cave, nextR, c);
-                  int nextEndIndex = findEndIndex(cave, nextR, c);
-
-                  digNums[nextR][nextBeginIndex][nextEndIndex] =
-                      Math.min(
-                          digNums[nextR][nextBeginIndex][nextEndIndex],
-                          digNums[r][beginIndex][endIndex]);
+                int landingR = findLandingR(cave, r + 1, c);
+                if (landingR - r <= F) {
+                  update(
+                      digNums,
+                      landingR,
+                      findBeginIndex(cave, landingR, c),
+                      findEndIndex(cave, landingR, c),
+                      digNums[r][beginIndex][endIndex]);
                 }
               }
             }
 
-            int leftBaseIndex =
+            int beginBaseIndex =
                 beginIndex + ((r == R - 1 || cave[r + 1][beginIndex] == '#') ? 0 : 1);
-            int rightBaseIndex = endIndex - ((r == R - 1 || cave[r + 1][endIndex] == '#') ? 0 : 1);
-            if (leftBaseIndex != rightBaseIndex) {
+            int endBaseIndex = endIndex - ((r == R - 1 || cave[r + 1][endIndex] == '#') ? 0 : 1);
+            if (beginBaseIndex != endBaseIndex) {
               int r_ = r;
               int[] baselessIndices =
-                  IntStream.rangeClosed(leftBaseIndex, rightBaseIndex)
+                  IntStream.rangeClosed(beginBaseIndex, endBaseIndex)
                       .filter(c -> r_ != R - 2 && cave[r_ + 2][c] == '.')
                       .toArray();
               for (int baselessIndex : baselessIndices) {
-                int nextR = r + 2;
-                while (nextR != R - 1 && cave[nextR + 1][baselessIndex] == '.') {
-                  ++nextR;
-                }
-
-                if (nextR - r <= F) {
-                  int nextBeginIndex = findBeginIndex(cave, nextR, baselessIndex);
-                  int nextEndIndex = findEndIndex(cave, nextR, baselessIndex);
-
-                  digNums[nextR][nextBeginIndex][nextEndIndex] =
-                      Math.min(
-                          digNums[nextR][nextBeginIndex][nextEndIndex],
-                          digNums[r][beginIndex][endIndex] + 1);
+                int landingR = findLandingR(cave, r + 2, baselessIndex);
+                if (landingR - r <= F) {
+                  update(
+                      digNums,
+                      landingR,
+                      findBeginIndex(cave, landingR, baselessIndex),
+                      findEndIndex(cave, landingR, baselessIndex),
+                      digNums[r][beginIndex][endIndex] + 1);
                 }
               }
 
               for (int i = 0; i <= baselessIndices.length; ++i) {
-                int minIndex = (i == 0) ? leftBaseIndex : baselessIndices[i - 1];
-                int maxIndex = (i == baselessIndices.length) ? rightBaseIndex : baselessIndices[i];
+                int minIndex = (i == 0) ? beginBaseIndex : baselessIndices[i - 1];
+                int maxIndex = (i == baselessIndices.length) ? endBaseIndex : baselessIndices[i];
                 for (int beginC = minIndex; beginC <= maxIndex; ++beginC) {
-                  int nextBeginIndex = findBeginIndex(cave, r + 1, beginC);
                   for (int endC = beginC; endC <= maxIndex; ++endC) {
-                    if ((beginC != leftBaseIndex || endC != rightBaseIndex)
+                    if ((beginC != beginBaseIndex || endC != endBaseIndex)
                         && (r == R - 2 || cave[r + 2][beginC] == '#' || cave[r + 2][endC] == '#')) {
-                      int nextEndIndex = findEndIndex(cave, r + 1, endC);
-
-                      digNums[r + 1][nextBeginIndex][nextEndIndex] =
-                          Math.min(
-                              digNums[r + 1][nextBeginIndex][nextEndIndex],
-                              digNums[r][beginIndex][endIndex] + (endC - beginC + 1));
+                      update(
+                          digNums,
+                          r + 1,
+                          findBeginIndex(cave, r + 1, beginC),
+                          findEndIndex(cave, r + 1, endC),
+                          digNums[r][beginIndex][endIndex] + (endC - beginC + 1));
                     }
                   }
                 }
@@ -119,6 +108,19 @@ public class Solution {
     }
 
     return (minDigNum == Integer.MAX_VALUE) ? "No" : String.format("Yes %d", minDigNum);
+  }
+
+  static void update(int[][][] digNums, int r, int beginIndex, int endIndex, int digNum) {
+    digNums[r][beginIndex][endIndex] = Math.min(digNums[r][beginIndex][endIndex], digNum);
+  }
+
+  static int findLandingR(char[][] cave, int r, int c) {
+    int landingR = r;
+    while (landingR != cave.length - 1 && cave[landingR + 1][c] == '.') {
+      ++landingR;
+    }
+
+    return landingR;
   }
 
   static int findBeginIndex(char[][] cave, int r, int c) {

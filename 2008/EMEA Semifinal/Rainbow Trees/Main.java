@@ -1,15 +1,16 @@
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-  static final int MODULUS = 1_000_000_009;
+  static final ModInt MOD_INT = new ModInt(1_000_000_009);
 
   public static void main(String[] args) {
     Scanner sc = new Scanner(System.in);
 
     int C = sc.nextInt();
-    for (int tc = 1; tc <= C; ++tc) {
+    for (int tc = 0; tc < C; ++tc) {
       int n = sc.nextInt();
       int k = sc.nextInt();
       int[] x = new int[n - 1];
@@ -19,7 +20,7 @@ public class Main {
         y[i] = sc.nextInt();
       }
 
-      System.out.println(String.format("Case #%d: %d", tc, solve(x, y, k)));
+      System.out.println(String.format("Case #%d: %d", tc + 1, solve(x, y, k)));
     }
 
     sc.close();
@@ -47,16 +48,50 @@ public class Main {
     for (int adj : adjLists[node]) {
       if (adj != parent) {
         result =
-            multiplyMod(
-                multiplyMod(result, rest), search(k, adjLists, node, adj, adjLists[node].size()));
+            MOD_INT.multiplyMod(
+                MOD_INT.multiplyMod(result, rest),
+                search(k, adjLists, node, adj, adjLists[node].size()));
         --rest;
       }
     }
 
     return result;
   }
+}
 
-  static int multiplyMod(int x, int y) {
-    return Math.floorMod((long) x * y, MODULUS);
+class ModInt {
+  int modulus;
+
+  ModInt(int modulus) {
+    this.modulus = modulus;
+  }
+
+  int mod(long x) {
+    return Math.floorMod(x, modulus);
+  }
+
+  int modInv(int x) {
+    return BigInteger.valueOf(x).modInverse(BigInteger.valueOf(modulus)).intValue();
+  }
+
+  int addMod(int x, int y) {
+    return mod(x + y);
+  }
+
+  int multiplyMod(int x, int y) {
+    return mod((long) x * y);
+  }
+
+  int divideMod(int x, int y) {
+    return multiplyMod(x, modInv(y));
+  }
+
+  int powMod(int base, long exponent) {
+    if (exponent == 0) {
+      return 1;
+    }
+
+    return multiplyMod(
+        (exponent % 2 == 0) ? 1 : base, powMod(multiplyMod(base, base), exponent / 2));
   }
 }

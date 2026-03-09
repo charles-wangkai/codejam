@@ -5,7 +5,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int N = sc.nextInt();
-    for (int tc = 1; tc <= N; ++tc) {
+    for (int tc = 0; tc < N; ++tc) {
       int P = sc.nextInt();
       int Q = sc.nextInt();
       int[] released = new int[Q];
@@ -13,7 +13,7 @@ public class Main {
         released[i] = sc.nextInt();
       }
 
-      System.out.println(String.format("Case #%d: %d", tc, solve(P, released)));
+      System.out.println(String.format("Case #%d: %d", tc + 1, solve(P, released)));
     }
 
     sc.close();

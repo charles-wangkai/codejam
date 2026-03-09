@@ -6,7 +6,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int N = sc.nextInt();
-    for (int tc = 1; tc <= N; ++tc) {
+    for (int tc = 0; tc < N; ++tc) {
       int R = sc.nextInt();
       int C = sc.nextInt();
       int[][] clues = new int[R][C];
@@ -16,7 +16,7 @@ public class Main {
         }
       }
 
-      System.out.println(String.format("Case #%d: %d", tc, solve(clues)));
+      System.out.println(String.format("Case #%d: %d", tc + 1, solve(clues)));
     }
 
     sc.close();

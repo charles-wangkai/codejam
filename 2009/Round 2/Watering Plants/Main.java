@@ -13,7 +13,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int C = sc.nextInt();
-    for (int tc = 1; tc <= C; ++tc) {
+    for (int tc = 0; tc < C; ++tc) {
       int N = sc.nextInt();
       int[] X = new int[N];
       int[] Y = new int[N];
@@ -24,7 +24,7 @@ public class Main {
         R[i] = sc.nextInt();
       }
 
-      System.out.println(String.format("Case #%d: %.9f", tc, solve(X, Y, R)));
+      System.out.println(String.format("Case #%d: %.9f", tc + 1, solve(X, Y, R)));
     }
 
     sc.close();

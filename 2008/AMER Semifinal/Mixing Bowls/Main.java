@@ -12,7 +12,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int C = sc.nextInt();
-    for (int tc = 1; tc <= C; ++tc) {
+    for (int tc = 0; tc < C; ++tc) {
       int N = sc.nextInt();
       String recipe = null;
       Map<String, List<String>> mixtureToIngredients = new HashMap<>();
@@ -33,7 +33,8 @@ public class Main {
         mixtureToIngredients.put(mixture, ingredients);
       }
 
-      System.out.println(String.format("Case #%d: %d", tc, solve(recipe, mixtureToIngredients)));
+      System.out.println(
+          String.format("Case #%d: %d", tc + 1, solve(recipe, mixtureToIngredients)));
     }
 
     sc.close();

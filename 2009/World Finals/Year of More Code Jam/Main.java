@@ -7,7 +7,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int C = sc.nextInt();
-    for (int tc = 1; tc <= C; ++tc) {
+    for (int tc = 0; tc < C; ++tc) {
       int N = sc.nextInt();
       int T = sc.nextInt();
       int[][] d = new int[T][];
@@ -20,7 +20,7 @@ public class Main {
         }
       }
 
-      System.out.println(String.format("Case #%d: %s", tc, solve(N, d)));
+      System.out.println(String.format("Case #%d: %s", tc + 1, solve(N, d)));
     }
 
     sc.close();

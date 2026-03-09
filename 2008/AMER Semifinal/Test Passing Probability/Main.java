@@ -13,7 +13,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int C = sc.nextInt();
-    for (int tc = 1; tc <= C; ++tc) {
+    for (int tc = 0; tc < C; ++tc) {
       int M = sc.nextInt();
       int Q = sc.nextInt();
       double[][] p = new double[Q][CHOICE_NUM];
@@ -23,7 +23,9 @@ public class Main {
         }
       }
 
-      System.out.println(String.format("Case #%d: %.9f", tc, solve(M, p)));
+      System.out.println(String.format("Case #%d: %.9f", tc + 1, solve(M, p)));
+
+      System.gc();
     }
 
     sc.close();

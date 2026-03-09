@@ -13,7 +13,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int T = sc.nextInt();
-    for (int tc = 1; tc <= T; ++tc) {
+    for (int tc = 0; tc < T; ++tc) {
       int N = sc.nextInt();
       String[] C = new String[N];
       int[] A = new int[N];
@@ -24,7 +24,7 @@ public class Main {
         B[i] = sc.nextInt();
       }
 
-      System.out.println(String.format("Case #%d: %s", tc, solve(C, A, B)));
+      System.out.println(String.format("Case #%d: %s", tc + 1, solve(C, A, B)));
     }
 
     sc.close();

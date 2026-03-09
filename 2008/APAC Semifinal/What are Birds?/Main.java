@@ -8,7 +8,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int C = sc.nextInt();
-    for (int tc = 1; tc <= C; ++tc) {
+    for (int tc = 0; tc < C; ++tc) {
       int N = sc.nextInt();
       Animal[] shown = new Animal[N];
       for (int i = 0; i < shown.length; ++i) {
@@ -27,7 +27,7 @@ public class Main {
         notShown[i] = new Animal(H, W, null);
       }
 
-      System.out.println(String.format("Case #%d:\n%s", tc, solve(shown, notShown)));
+      System.out.println(String.format("Case #%d:\n%s", tc + 1, solve(shown, notShown)));
     }
 
     sc.close();

@@ -9,11 +9,11 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int T = sc.nextInt();
-    for (int tc = 1; tc <= T; ++tc) {
+    for (int tc = 0; tc < T; ++tc) {
       int C = sc.nextInt();
       int R = sc.nextInt();
-      int myC = sc.nextInt() - 1;
-      int myR = sc.nextInt() - 1;
+      int myC = sc.nextInt();
+      int myR = sc.nextInt();
       int[][] S = new int[R][C];
       for (int r = 0; r < R; ++r) {
         for (int c = 0; c < C; ++c) {
@@ -21,7 +21,7 @@ public class Main {
         }
       }
 
-      System.out.println(String.format("Case #%d: %s", tc, solve(S, myC, myR)));
+      System.out.println(String.format("Case #%d: %s", tc + 1, solve(S, myC, myR)));
     }
 
     sc.close();
@@ -46,7 +46,7 @@ public class Main {
 
     for (int r = 0; r < R; ++r) {
       for (int c = 0; c < C; ++c) {
-        if (r != myR || c != myC) {
+        if (r != myR - 1 || c != myC - 1) {
           int direction = -1;
           for (int i = 0; i < R_OFFSETS.length; ++i) {
             int adjR = r + R_OFFSETS[i];
@@ -68,7 +68,7 @@ public class Main {
       }
     }
 
-    if (next[myR][myC] == 0) {
+    if (next[myR - 1][myC - 1] == 0) {
       return 0;
     }
     if (isForever(next, myR, myC)) {
@@ -77,11 +77,11 @@ public class Main {
 
     int maxSubResult = search(next, myR, myC);
     for (int i = 0; i < R_OFFSETS.length; ++i) {
-      int adjR = myR + R_OFFSETS[i];
-      int adjC = myC + C_OFFSETS[i];
+      int adjR = (myR - 1) + R_OFFSETS[i];
+      int adjC = (myC - 1) + C_OFFSETS[i];
       if (adjR >= 0 && adjR < R && adjC >= 0 && adjC < C && next[adjR][adjC] != 0) {
         int old = next[adjR][adjC];
-        next[adjR][adjC] = Math.max(0, next[adjR][adjC] - current[myR][myC]);
+        next[adjR][adjC] = Math.max(0, next[adjR][adjC] - current[myR - 1][myC - 1]);
         maxSubResult = Math.max(maxSubResult, search(next, myR, myC));
 
         next[adjR][adjC] = old;
@@ -98,8 +98,8 @@ public class Main {
     return !IntStream.range(0, R_OFFSETS.length)
         .anyMatch(
             i -> {
-              int adjR = myR + R_OFFSETS[i];
-              int adjC = myC + C_OFFSETS[i];
+              int adjR = (myR - 1) + R_OFFSETS[i];
+              int adjC = (myC - 1) + C_OFFSETS[i];
 
               return adjR >= 0 && adjR < R && adjC >= 0 && adjC < C && next[adjR][adjC] != 0;
             });

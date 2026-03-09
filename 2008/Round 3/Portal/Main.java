@@ -12,7 +12,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int N = sc.nextInt();
-    for (int tc = 1; tc <= N; ++tc) {
+    for (int tc = 0; tc < N; ++tc) {
       int R = sc.nextInt();
       int C = sc.nextInt();
       char[][] grid = new char[R][C];
@@ -23,7 +23,7 @@ public class Main {
         }
       }
 
-      System.out.println(String.format("Case #%d: %s", tc, solve(grid)));
+      System.out.println(String.format("Case #%d: %s", tc + 1, solve(grid)));
     }
 
     sc.close();

@@ -16,7 +16,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int T = sc.nextInt();
-    for (int tc = 1; tc <= T; ++tc) {
+    for (int tc = 0; tc < T; ++tc) {
       int N = sc.nextInt();
       int M = sc.nextInt();
       char[][] calendar = new char[N][M];
@@ -27,7 +27,7 @@ public class Main {
         }
       }
 
-      System.out.println(String.format("Case #%d: %d", tc, solve(calendar)));
+      System.out.println(String.format("Case #%d: %d", tc + 1, solve(calendar)));
     }
 
     sc.close();
@@ -40,24 +40,17 @@ public class Main {
     int row = calendar.length;
     int col = calendar[0].length;
 
-    int s = 0;
-    int t = row * col + 1;
-
-    List<Edge> edges = new ArrayList<>();
-
-    @SuppressWarnings("unchecked")
-    List<Integer>[] edgeLists = new List[row * col + 2];
-    for (int i = 0; i < edgeLists.length; ++i) {
-      edgeLists[i] = new ArrayList<>();
-    }
+    MaxFlow maxFlow = new MaxFlow(row * col + 2);
+    int source = 0;
+    int sink = row * col + 1;
     for (int r = 0; r < row; ++r) {
       for (int c = 0; c < col; ++c) {
         int index = r * col + c + 1;
 
         if (calendar[r][c] == '#') {
-          addEdges(edges, edgeLists, s, index, INF);
+          maxFlow.addEdges(source, index, INF);
         } else if (calendar[r][c] == '.') {
-          addEdges(edges, edgeLists, index, t, INF);
+          maxFlow.addEdges(index, sink, INF);
         }
 
         for (int i = 0; i < R_OFFSETS.length; ++i) {
@@ -66,13 +59,13 @@ public class Main {
           if (adjR >= 0 && adjR < row && adjC >= 0 && adjC < col) {
             int adjIndex = adjR * col + adjC + 1;
 
-            addEdges(edges, edgeLists, index, adjIndex, 1);
+            maxFlow.addEdges(index, adjIndex, 1);
           }
         }
       }
     }
 
-    return (row - 1) * col + row * (col - 1) - dinic(edges, edgeLists, s, t);
+    return (row - 1) * col + row * (col - 1) - maxFlow.dinic(source, sink);
   }
 
   static char[][] extend(char[][] calendar) {
@@ -104,25 +97,38 @@ public class Main {
       }
     }
   }
+}
 
-  static void addEdges(List<Edge> edges, List<Integer>[] edgeLists, int u, int v, int z) {
-    edges.add(new Edge(u, v, z));
+class MaxFlow {
+  List<Edge> edges = new ArrayList<>();
+  List<Integer>[] edgeLists;
+
+  @SuppressWarnings("unchecked")
+  MaxFlow(int size) {
+    edgeLists = new List[size];
+    for (int i = 0; i < edgeLists.length; ++i) {
+      edgeLists[i] = new ArrayList<>();
+    }
+  }
+
+  void addEdges(int u, int v, int cap) {
+    edges.add(new Edge(u, v, cap));
     edgeLists[u].add(edges.size() - 1);
 
     edges.add(new Edge(v, u, 0));
     edgeLists[v].add(edges.size() - 1);
   }
 
-  static int dinic(List<Edge> edges, List<Integer>[] edgeLists, int s, int t) {
+  int dinic(int s, int t) {
     int result = 0;
     while (true) {
-      int[] levels = bfs(edges, edgeLists, s, t);
+      int[] levels = bfs(s, t);
       if (levels == null) {
         break;
       }
 
       while (true) {
-        int minflow = dfs(edges, edgeLists, levels, s, t, Integer.MAX_VALUE);
+        int minflow = dfs(levels, s, t, Integer.MAX_VALUE);
         if (minflow == 0) {
           break;
         }
@@ -134,7 +140,7 @@ public class Main {
     return result;
   }
 
-  static int[] bfs(List<Edge> edges, List<Integer>[] edgeLists, int s, int t) {
+  private int[] bfs(int s, int t) {
     int[] levels = new int[edgeLists.length];
     Arrays.fill(levels, -1);
     levels[s] = 0;
@@ -160,7 +166,7 @@ public class Main {
     return null;
   }
 
-  static int dfs(List<Edge> edges, List<Integer>[] edgeLists, int[] levels, int s, int t, int low) {
+  private int dfs(int[] levels, int s, int t, int low) {
     if (s == t) {
       return low;
     }
@@ -169,7 +175,7 @@ public class Main {
     for (int e : edgeLists[s]) {
       Edge edge = edges.get(e);
       if (edge.capacity != 0 && levels[edge.to] == levels[s] + 1) {
-        int next = dfs(edges, edgeLists, levels, edge.to, t, Math.min(low - result, edge.capacity));
+        int next = dfs(levels, edge.to, t, Math.min(low - result, edge.capacity));
         edge.capacity -= next;
         edges.get(e ^ 1).capacity += next;
 
@@ -186,16 +192,16 @@ public class Main {
 
     return result;
   }
-}
 
-class Edge {
-  int from;
-  int to;
-  int capacity;
+  static class Edge {
+    int from;
+    int to;
+    int capacity;
 
-  Edge(int from, int to, int capacity) {
-    this.from = from;
-    this.to = to;
-    this.capacity = capacity;
+    Edge(int from, int to, int capacity) {
+      this.from = from;
+      this.to = to;
+      this.capacity = capacity;
+    }
   }
 }

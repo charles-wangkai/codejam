@@ -4,7 +4,7 @@ import java.util.Scanner;
 import java.util.stream.IntStream;
 
 public class Main {
-  static final int MODULUS = 10007;
+  static final ModInt MOD_INT = new ModInt(10007);
   static final int LIMIT = 100_000_000;
 
   static short[] factorialMods;
@@ -16,7 +16,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int N = sc.nextInt();
-    for (int tc = 1; tc <= N; ++tc) {
+    for (int tc = 0; tc < N; ++tc) {
       int H = sc.nextInt();
       int W = sc.nextInt();
       int R = sc.nextInt();
@@ -27,7 +27,7 @@ public class Main {
         c[i] = sc.nextInt();
       }
 
-      System.out.println(String.format("Case #%d: %d", tc, solve(H, W, r, c)));
+      System.out.println(String.format("Case #%d: %d", tc + 1, solve(H, W, r, c)));
     }
 
     sc.close();
@@ -40,12 +40,12 @@ public class Main {
     for (int i = 1; i < factorialMods.length; ++i) {
       factorialExponents[i] = factorialExponents[i - 1];
       int rest = i;
-      while (rest % MODULUS == 0) {
+      while (rest % MOD_INT.modulus == 0) {
         ++factorialExponents[i];
-        rest /= MODULUS;
+        rest /= MOD_INT.modulus;
       }
 
-      factorialMods[i] = (short) multiplyMod(factorialMods[i - 1], rest % MODULUS);
+      factorialMods[i] = (short) MOD_INT.multiplyMod(factorialMods[i - 1], rest % MOD_INT.modulus);
     }
   }
 
@@ -69,14 +69,14 @@ public class Main {
       int term = computeWayNums(r[indices[0]] - 1, c[indices[0]] - 1);
       for (int i = 0; i < indices.length; ++i) {
         term =
-            multiplyMod(
+            MOD_INT.multiplyMod(
                 term,
                 computeWayNums(
                     ((i == indices.length - 1) ? H : r[indices[i + 1]]) - r[indices[i]],
                     ((i == indices.length - 1) ? W : c[indices[i + 1]]) - c[indices[i]]));
       }
 
-      result = addMod(result, ((indices.length % 2 == 0) ? 1 : -1) * term);
+      result = MOD_INT.addMod(result, ((indices.length % 2 == 0) ? 1 : -1) * term);
     }
 
     return result;
@@ -97,21 +97,47 @@ public class Main {
     return C(sum, num1);
   }
 
-  static int addMod(int x, int y) {
-    return Math.floorMod(x + y, MODULUS);
-  }
-
-  static int multiplyMod(int x, int y) {
-    return x * y % MODULUS;
-  }
-
-  static int divideMod(int x, int y) {
-    return multiplyMod(x, BigInteger.valueOf(y).modInverse(BigInteger.valueOf(MODULUS)).intValue());
-  }
-
   static int C(int n, int r) {
     return (factorialExponents[n] == factorialExponents[r] + factorialExponents[n - r])
-        ? divideMod(factorialMods[n], multiplyMod(factorialMods[r], factorialMods[n - r]))
+        ? MOD_INT.divideMod(
+            factorialMods[n], MOD_INT.multiplyMod(factorialMods[r], factorialMods[n - r]))
         : 0;
+  }
+}
+
+class ModInt {
+  int modulus;
+
+  ModInt(int modulus) {
+    this.modulus = modulus;
+  }
+
+  int mod(long x) {
+    return Math.floorMod(x, modulus);
+  }
+
+  int modInv(int x) {
+    return BigInteger.valueOf(x).modInverse(BigInteger.valueOf(modulus)).intValue();
+  }
+
+  int addMod(int x, int y) {
+    return mod(x + y);
+  }
+
+  int multiplyMod(int x, int y) {
+    return mod((long) x * y);
+  }
+
+  int divideMod(int x, int y) {
+    return multiplyMod(x, modInv(y));
+  }
+
+  int powMod(int base, long exponent) {
+    if (exponent == 0) {
+      return 1;
+    }
+
+    return multiplyMod(
+        (exponent % 2 == 0) ? 1 : base, powMod(multiplyMod(base, base), exponent / 2));
   }
 }

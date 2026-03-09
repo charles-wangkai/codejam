@@ -7,7 +7,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int T = sc.nextInt();
-    for (int tc = 1; tc <= T; ++tc) {
+    for (int tc = 0; tc < T; ++tc) {
       int N = sc.nextInt();
       int[][] matrix = new int[N][N];
       for (int r = 0; r < N; ++r) {
@@ -17,7 +17,7 @@ public class Main {
         }
       }
 
-      System.out.println(String.format("Case #%d: %d", tc, solve(matrix)));
+      System.out.println(String.format("Case #%d: %d", tc + 1, solve(matrix)));
     }
 
     sc.close();

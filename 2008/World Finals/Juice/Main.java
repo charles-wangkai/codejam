@@ -39,29 +39,40 @@ public class Main {
               .mapToInt(Integer::intValue)
               .toArray();
 
-      int[] binaryIndexedTree = new int[Integer.highestOneBit(FULL + 1) * 2 + 1];
+      FenwickTree fenwickTree = new FenwickTree(FULL + 1);
       for (int index : sortedIndices) {
-        add(binaryIndexedTree, C[index] + 1, 1);
+        fenwickTree.add(C[index] + 1, 1);
 
-        result = Math.max(result, computeSum(binaryIndexedTree, FULL - fractionA - B[index] + 1));
+        int pos = FULL - fractionA - B[index] + 1;
+        if (pos >= 0) {
+          result = Math.max(result, fenwickTree.computePrefixSum(pos));
+        }
       }
     }
 
     return result;
   }
+}
 
-  static void add(int[] binaryIndexedTree, int i, int x) {
-    while (i < binaryIndexedTree.length) {
-      binaryIndexedTree[i] += x;
-      i += i & -i;
+class FenwickTree {
+  int[] a;
+
+  FenwickTree(int size) {
+    a = new int[Integer.highestOneBit(size) * 2 + 1];
+  }
+
+  void add(int pos, int delta) {
+    while (pos < a.length) {
+      a[pos] += delta;
+      pos += pos & -pos;
     }
   }
 
-  static int computeSum(int[] binaryIndexedTree, int i) {
+  int computePrefixSum(int pos) {
     int result = 0;
-    while (i > 0) {
-      result += binaryIndexedTree[i];
-      i -= i & -i;
+    while (pos != 0) {
+      result += a[pos];
+      pos -= pos & -pos;
     }
 
     return result;

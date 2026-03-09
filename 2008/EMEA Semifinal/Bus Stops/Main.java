@@ -1,10 +1,11 @@
+import java.math.BigInteger;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Main {
-  static final int MODULUS = 30031;
+  static final ModInt MOD_INT = new ModInt(30031);
 
   public static void main(String[] args) {
     Scanner sc = new Scanner(System.in);
@@ -51,21 +52,13 @@ public class Main {
     return state[maskToIndex.get((1 << K) - 1)];
   }
 
-  static int addMod(int x, int y) {
-    return Math.floorMod(x + y, MODULUS);
-  }
-
-  static int multiplyMod(int x, int y) {
-    return Math.floorMod(x * y, MODULUS);
-  }
-
   static int[] multiply(int[] v, int[][] m) {
     int size = v.length;
 
     int[] result = new int[size];
     for (int i = 0; i < result.length; ++i) {
       for (int j = 0; j < size; ++j) {
-        result[i] = addMod(result[i], multiplyMod(v[j], m[j][i]));
+        result[i] = MOD_INT.addMod(result[i], MOD_INT.multiplyMod(v[j], m[j][i]));
       }
     }
 
@@ -79,7 +72,7 @@ public class Main {
     for (int i = 0; i < size; ++i) {
       for (int j = 0; j < size; ++j) {
         for (int k = 0; k < size; ++k) {
-          result[i][j] = addMod(result[i][j], multiplyMod(m1[i][k], m2[k][j]));
+          result[i][j] = MOD_INT.addMod(result[i][j], MOD_INT.multiplyMod(m1[i][k], m2[k][j]));
         }
       }
     }
@@ -103,5 +96,42 @@ public class Main {
     }
 
     return result;
+  }
+}
+
+class ModInt {
+  int modulus;
+
+  ModInt(int modulus) {
+    this.modulus = modulus;
+  }
+
+  int mod(long x) {
+    return Math.floorMod(x, modulus);
+  }
+
+  int modInv(int x) {
+    return BigInteger.valueOf(x).modInverse(BigInteger.valueOf(modulus)).intValue();
+  }
+
+  int addMod(int x, int y) {
+    return mod(x + y);
+  }
+
+  int multiplyMod(int x, int y) {
+    return mod((long) x * y);
+  }
+
+  int divideMod(int x, int y) {
+    return multiplyMod(x, modInv(y));
+  }
+
+  int powMod(int base, long exponent) {
+    if (exponent == 0) {
+      return 1;
+    }
+
+    return multiplyMod(
+        (exponent % 2 == 0) ? 1 : base, powMod(multiplyMod(base, base), exponent / 2));
   }
 }

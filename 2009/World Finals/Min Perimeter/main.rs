@@ -9,7 +9,7 @@ fn main() {
     br.read_line(&mut line).unwrap();
     let mut split = line.split_whitespace();
     let T = split.next().unwrap().parse().unwrap();
-    for tc in 1..=T {
+    for tc in 0..T {
         let mut line = String::new();
         br.read_line(&mut line).unwrap();
         let mut split = line.split_whitespace();
@@ -24,7 +24,7 @@ fn main() {
             y.push(split.next().unwrap().parse().unwrap());
         }
 
-        println!("Case #{}: {:.9}", tc, solve(&x, &y));
+        println!("Case #{}: {:.9}", tc + 1, solve(&x, &y));
     }
 }
 

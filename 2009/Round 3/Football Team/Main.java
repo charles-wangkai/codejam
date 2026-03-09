@@ -15,7 +15,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int T = sc.nextInt();
-    for (int tc = 1; tc <= T; ++tc) {
+    for (int tc = 0; tc < T; ++tc) {
       int N = sc.nextInt();
       int[] xs = new int[N];
       int[] ys = new int[N];
@@ -24,7 +24,7 @@ public class Main {
         ys[i] = sc.nextInt();
       }
 
-      System.out.println(String.format("Case #%d: %d", tc, solve(xs, ys)));
+      System.out.println(String.format("Case #%d: %d", tc + 1, solve(xs, ys)));
     }
 
     sc.close();

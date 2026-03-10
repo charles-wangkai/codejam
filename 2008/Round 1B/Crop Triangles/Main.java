@@ -5,7 +5,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int N = sc.nextInt();
-    for (int tc = 1; tc <= N; ++tc) {
+    for (int tc = 0; tc < N; ++tc) {
       int n = sc.nextInt();
       int A = sc.nextInt();
       int B = sc.nextInt();
@@ -15,7 +15,7 @@ public class Main {
       int y0 = sc.nextInt();
       int M = sc.nextInt();
 
-      System.out.println(String.format("Case #%d: %d", tc, solve(n, A, B, C, D, x0, y0, M)));
+      System.out.println(String.format("Case #%d: %d", tc + 1, solve(n, A, B, C, D, x0, y0, M)));
     }
 
     sc.close();

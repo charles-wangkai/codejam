@@ -7,14 +7,14 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int N = sc.nextInt();
-    for (int tc = 1; tc <= N; ++tc) {
+    for (int tc = 0; tc < N; ++tc) {
       double f = sc.nextDouble();
       double R = sc.nextDouble();
       double t = sc.nextDouble();
       double r = sc.nextDouble();
       double g = sc.nextDouble();
 
-      System.out.println(String.format("Case #%d: %.9f", tc, solve(f, R, t, r, g)));
+      System.out.println(String.format("Case #%d: %.9f", tc + 1, solve(f, R, t, r, g)));
     }
 
     sc.close();

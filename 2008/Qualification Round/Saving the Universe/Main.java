@@ -6,7 +6,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int N = sc.nextInt();
-    for (int tc = 1; tc <= N; ++tc) {
+    for (int tc = 0; tc < N; ++tc) {
       int S = sc.nextInt();
       sc.nextLine();
       String[] engines = new String[S];
@@ -20,7 +20,7 @@ public class Main {
         queries[i] = sc.nextLine();
       }
 
-      System.out.println(String.format("Case #%d: %d", tc, solve(engines, queries)));
+      System.out.println(String.format("Case #%d: %d", tc + 1, solve(engines, queries)));
     }
 
     sc.close();

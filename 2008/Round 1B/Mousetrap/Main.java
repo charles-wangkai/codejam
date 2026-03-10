@@ -1,5 +1,3 @@
-// https://en.wikipedia.org/wiki/Fenwick_tree
-
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -9,15 +7,15 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int T = sc.nextInt();
-    for (int tc = 1; tc <= T; ++tc) {
+    for (int tc = 0; tc < T; ++tc) {
       int K = sc.nextInt();
       int n = sc.nextInt();
       int[] d = new int[n];
       for (int i = 0; i < d.length; ++i) {
-        d[i] = sc.nextInt() - 1;
+        d[i] = sc.nextInt();
       }
 
-      System.out.println(String.format("Case #%d: %s", tc, solve(K, d)));
+      System.out.println(String.format("Case #%d: %s", tc + 1, solve(K, d)));
     }
 
     sc.close();
@@ -26,37 +24,39 @@ public class Main {
   static String solve(int K, int[] d) {
     int[] values = new int[K];
 
-    int[] A = new int[Integer.highestOneBit(K) * 2 + 1];
+    FenwickTree fenwickTree = new FenwickTree(K);
     for (int i = 0; i < K; ++i) {
-      add(A, i, 1);
+      fenwickTree.add(i + 1, 1);
     }
 
     int index = -1;
     for (int value = 1; value <= K; ++value) {
       int step = (value - 1) % (K - value + 1) + 1;
-      int maxRight = prefixSum(A, K - 1) - ((index == -1) ? 0 : prefixSum(A, index));
+      int maxRight =
+          fenwickTree.computePrefixSum(K)
+              - ((index == -1) ? 0 : fenwickTree.computePrefixSum(index + 1));
       if (step <= maxRight) {
-        index = findNext(A, index + 1, K - 1, step);
+        index = findNext(fenwickTree, index + 1, K - 1, step);
       } else {
-        index = findNext(A, 0, index - 1, step - maxRight);
+        index = findNext(fenwickTree, 0, index - 1, step - maxRight);
       }
 
       values[index] = value;
-      add(A, index, -1);
+      fenwickTree.add(index + 1, -1);
     }
 
     return Arrays.stream(d)
-        .map(i -> values[i])
+        .map(di -> values[di - 1])
         .mapToObj(String::valueOf)
         .collect(Collectors.joining(" "));
   }
 
-  static int findNext(int[] A, int lowerIndex, int upperIndex, int targetDiff) {
-    int baseSum = (lowerIndex == 0) ? 0 : prefixSum(A, lowerIndex - 1);
+  static int findNext(FenwickTree fenwickTree, int lowerIndex, int upperIndex, int targetDiff) {
+    int baseSum = (lowerIndex == 0) ? 0 : fenwickTree.computePrefixSum(lowerIndex);
     int result = -1;
     while (lowerIndex <= upperIndex) {
       int middleIndex = (lowerIndex + upperIndex) / 2;
-      if (prefixSum(A, middleIndex) - baseSum >= targetDiff) {
+      if (fenwickTree.computePrefixSum(middleIndex + 1) - baseSum >= targetDiff) {
         result = middleIndex;
         upperIndex = middleIndex - 1;
       } else {
@@ -66,22 +66,29 @@ public class Main {
 
     return result;
   }
+}
 
-  static int LSB(int x) {
-    return x & -x;
+class FenwickTree {
+  int[] a;
+
+  FenwickTree(int size) {
+    a = new int[Integer.highestOneBit(size) * 2 + 1];
   }
 
-  static void add(int[] A, int i, int delta) {
-    if (i == 0) {
-      A[0] += delta;
-      return;
+  void add(int pos, int delta) {
+    while (pos < a.length) {
+      a[pos] += delta;
+      pos += pos & -pos;
     }
-    for (; i < A.length; i += LSB(i)) A[i] += delta;
   }
 
-  static int prefixSum(int[] A, int i) {
-    int sum = A[0];
-    for (; i != 0; i -= LSB(i)) sum += A[i];
-    return sum;
+  int computePrefixSum(int pos) {
+    int result = 0;
+    while (pos != 0) {
+      result += a[pos];
+      pos -= pos & -pos;
+    }
+
+    return result;
   }
 }

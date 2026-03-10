@@ -10,7 +10,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int T = sc.nextInt();
-    for (int tc = 1; tc <= T; ++tc) {
+    for (int tc = 0; tc < T; ++tc) {
       int n = sc.nextInt();
       int[] x = new int[n];
       for (int i = 0; i < x.length; ++i) {
@@ -21,16 +21,20 @@ public class Main {
         y[i] = sc.nextInt();
       }
 
-      System.out.println(String.format("Case #%d: %d", tc, solve(x, y)));
+      System.out.println(String.format("Case #%d: %d", tc + 1, solve(x, y)));
     }
 
     sc.close();
   }
 
   static long solve(int[] x, int[] y) {
-    int[] sortedX = Arrays.stream(x).boxed().sorted().mapToInt(a -> a).toArray();
+    int[] sortedX = Arrays.stream(x).boxed().sorted().mapToInt(Integer::intValue).toArray();
     int[] sortedY =
-        Arrays.stream(y).boxed().sorted(Comparator.reverseOrder()).mapToInt(a -> a).toArray();
+        Arrays.stream(y)
+            .boxed()
+            .sorted(Comparator.reverseOrder())
+            .mapToInt(Integer::intValue)
+            .toArray();
 
     return IntStream.range(0, sortedX.length).mapToLong(i -> (long) sortedX[i] * sortedY[i]).sum();
   }

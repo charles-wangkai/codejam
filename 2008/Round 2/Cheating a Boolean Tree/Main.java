@@ -6,7 +6,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int N = sc.nextInt();
-    for (int tc = 1; tc <= N; ++tc) {
+    for (int tc = 0; tc < N; ++tc) {
       int M = sc.nextInt();
       int V = sc.nextInt();
       int[] G = new int[(M - 1) / 2];
@@ -20,7 +20,7 @@ public class Main {
         I[i] = sc.nextInt();
       }
 
-      System.out.println(String.format("Case #%d: %s", tc, solve(M, V, G, C, I)));
+      System.out.println(String.format("Case #%d: %s", tc + 1, solve(M, V, G, C, I)));
     }
 
     sc.close();

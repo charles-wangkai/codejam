@@ -9,7 +9,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int N = sc.nextInt();
-    for (int tc = 1; tc <= N; ++tc) {
+    for (int tc = 0; tc < N; ++tc) {
       int T = sc.nextInt();
       int NA = sc.nextInt();
       int NB = sc.nextInt();
@@ -23,7 +23,7 @@ public class Main {
         bTrips[i] = sc.nextLine();
       }
 
-      System.out.println(String.format("Case #%d: %s", tc, solve(T, aTrips, bTrips)));
+      System.out.println(String.format("Case #%d: %s", tc + 1, solve(T, aTrips, bTrips)));
     }
 
     sc.close();

@@ -10,7 +10,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int T = sc.nextInt();
-    for (int tc = 1; tc <= T; ++tc) {
+    for (int tc = 0; tc < T; ++tc) {
       int N = sc.nextInt();
       int[] x = new int[N];
       int[] y = new int[N];
@@ -23,7 +23,7 @@ public class Main {
         p[i] = sc.nextInt();
       }
 
-      System.out.println(String.format("Case #%d: %.9f", tc, solve(x, y, z, p)));
+      System.out.println(String.format("Case #%d: %.9f", tc + 1, solve(x, y, z, p)));
     }
 
     sc.close();

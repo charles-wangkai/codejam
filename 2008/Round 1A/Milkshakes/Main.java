@@ -9,7 +9,7 @@ public class Main {
     Scanner sc = new Scanner(System.in);
 
     int C = sc.nextInt();
-    for (int tc = 1; tc <= C; ++tc) {
+    for (int tc = 0; tc < C; ++tc) {
       int N = sc.nextInt();
       int M = sc.nextInt();
       @SuppressWarnings("unchecked")
@@ -27,7 +27,7 @@ public class Main {
         }
       }
 
-      System.out.println(String.format("Case #%d: %s", tc, solve(N, flavorToMaltedMaps)));
+      System.out.println(String.format("Case #%d: %s", tc + 1, solve(N, flavorToMaltedMaps)));
     }
 
     sc.close();

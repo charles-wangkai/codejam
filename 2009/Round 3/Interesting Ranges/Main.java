@@ -3,18 +3,18 @@
 import java.math.BigInteger;
 import java.util.Scanner;
 
-public class Solution {
+public class Main {
   static final int MODULUS = 1_000_000_007;
 
   public static void main(String[] args) {
     Scanner sc = new Scanner(System.in);
 
     int T = sc.nextInt();
-    for (int tc = 1; tc <= T; ++tc) {
+    for (int tc = 0; tc < T; ++tc) {
       BigInteger L = sc.nextBigInteger();
       BigInteger R = sc.nextBigInteger();
 
-      System.out.println(String.format("Case #%d: %d", tc, solve(L, R)));
+      System.out.println(String.format("Case #%d: %d", tc + 1, solve(L, R)));
     }
 
     sc.close();
@@ -52,9 +52,11 @@ public class Solution {
     int digitNum = computeDigitNum(x);
     if (digitNum == 0) {
       return BigInteger.ZERO;
-    } else if (digitNum == 1) {
+    }
+    if (digitNum == 1) {
       return x.add(BigInteger.ONE).divide(BigInteger.TWO);
-    } else if (digitNum == 2) {
+    }
+    if (digitNum == 2) {
       if (x.equals(BigInteger.TEN)) {
         return BigInteger.ONE;
       }
